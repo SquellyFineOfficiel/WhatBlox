@@ -114,10 +114,10 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
     let ignore = false;
 
     const loadMetadata = async () => {
-      const nextMetadata: Record<string, RobloxMetadata | null> = {};
-      for (const game of games) {
-        nextMetadata[game.id] = await getRobloxGameMetadata(game.roblox_url);
-      }
+      const metadataEntries = await Promise.all(
+        games.map(async (game) => [game.id, await getRobloxGameMetadata(game.roblox_url)] as const)
+      );
+      const nextMetadata = Object.fromEntries(metadataEntries);
       if (!ignore) {
         setMetadataMap(nextMetadata);
       }
@@ -200,7 +200,7 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
         ) : null}
       </section>
 
-      <section className="grid gap-8 lg:grid-cols-[1fr_320px]">
+      <section className="space-y-8">
         {/* Trending list */}
         <div className="space-y-5">
           <div className="flex items-center gap-3">
@@ -299,26 +299,27 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
           )}
         </div>
 
-        {/* Sidebar — Recent */}
-        <aside className="space-y-5">
+        {/* Recent games */}
+        <div className="space-y-5">
           <div className="flex items-center gap-3">
             <div className="h-5 w-1 rounded-full bg-gradient-to-b from-rbx-purple to-rbx-red" />
             <h2 className="text-base font-black uppercase tracking-widest text-white">Recent</h2>
           </div>
-          <div className="rounded-2xl border border-rbx-border bg-rbx-surface overflow-hidden">
+
+          <div className="flex gap-3 overflow-x-auto pb-1">
             {games.slice(0, 5).map((game, idx) => (
-              <div
+              <article
                 key={`${game.id}-recent`}
-                className="flex items-start gap-3 border-b border-rbx-border p-4 last:border-b-0 transition hover:bg-rbx-surface-2"
+                className="min-w-[240px] rounded-xl border border-rbx-border bg-rbx-surface p-4 transition hover:bg-rbx-surface-2"
               >
-                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-rbx-red to-rbx-orange text-[10px] font-black text-white">
+                <span className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br from-rbx-red to-rbx-orange text-[10px] font-black text-white">
                   {idx + 1}
                 </span>
-                <div className="min-w-0">
-                  <p className="text-sm font-bold text-white truncate">{game.title}</p>
+                <div className="mt-2 min-w-0">
+                  <p className="truncate text-sm font-bold text-white">{game.title}</p>
                   <p className="mt-0.5 line-clamp-2 text-xs text-rbx-muted leading-relaxed">{game.description}</p>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
 
@@ -334,7 +335,7 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
               Submit a game →
             </Link>
           </div>
-        </aside>
+        </div>
       </section>
     </main>
   );
