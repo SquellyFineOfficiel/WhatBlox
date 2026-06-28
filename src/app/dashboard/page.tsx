@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getServerUser } from '@/src/lib/auth-server';
 import { createClient } from '@/src/lib/supabase/server';
+import { getAdminUser } from '@/src/lib/admin';
 
 type GameRow = {
   id: string;
@@ -48,6 +49,8 @@ export default async function DashboardPage() {
     );
   }
 
+  const adminUser = await getAdminUser();
+
   const [{ data: games }, { count: gameCount }] = await Promise.all([
     supabase
       .from('games')
@@ -89,8 +92,15 @@ export default async function DashboardPage() {
             <h1 className="mt-6 text-4xl font-black tracking-tight text-white">Your games and stats</h1>
             <p className="mt-3 text-base text-rbx-muted leading-relaxed">Manage what you submitted and see where each game stands in the review pipeline.</p>
           </div>
-          <div className="rounded-xl border border-rbx-border bg-rbx-surface-2 px-5 py-4 text-sm text-rbx-muted whitespace-nowrap">
-            <span className="font-bold text-white">Slots remaining:</span> {slotsRemaining} of 3
+          <div className="flex flex-col gap-3 items-end">
+            <div className="rounded-xl border border-rbx-border bg-rbx-surface-2 px-5 py-4 text-sm text-rbx-muted whitespace-nowrap">
+              <span className="font-bold text-white">Slots remaining:</span> {slotsRemaining} of 3
+            </div>
+            {adminUser && (
+              <Link href="/admin" className="rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 px-5 py-3 text-sm font-bold text-white transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-purple-500">
+                Admin Panel
+              </Link>
+            )}
           </div>
         </div>
 
