@@ -67,6 +67,7 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
       const { data, error } = await supabase
         .from('games')
         .select('id,title,description,roblox_url,created_at,user_id')
+        .eq('status', 'approved')
         .order('created_at', { ascending: false });
 
       if (!error && data) {
@@ -141,88 +142,90 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
   };
 
   return (
-    <main className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-10 sm:px-6 lg:px-8">
+    <main className="mx-auto flex max-w-6xl flex-col gap-12 px-4 py-16 sm:px-6 lg:px-8">
 
       {/* Hero — diagonal gradient mesh */}
-      <section className="relative overflow-hidden rounded-2xl border border-rbx-border bg-rbx-surface p-8 md:p-10">
+      <section className="relative overflow-hidden rounded-3xl border border-rbx-border bg-rbx-surface p-10 md:p-14">
         {/* Decorative gradient blobs */}
         <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-gradient-to-br from-rbx-purple/30 to-rbx-red/20 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-16 -left-16 h-56 w-56 rounded-full bg-gradient-to-tr from-rbx-red/20 to-rbx-orange/20 blur-3xl" />
 
-        <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div className="max-w-xl">
-            <span className="inline-block rounded-md bg-gradient-to-r from-rbx-red to-rbx-orange px-3 py-1 text-[11px] font-black uppercase tracking-widest text-white">
+        <div className="relative flex flex-col gap-8 md:flex-row md:items-center md:justify-between md:gap-12">
+          <div className="max-w-2xl">
+            <span className="inline-block rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-1.5 text-[11px] font-black uppercase tracking-widest text-white">
               WhatBlox
             </span>
-            <h1 className="mt-4 text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl">
+            <h1 className="mt-6 text-5xl font-black leading-tight tracking-tight text-white sm:text-6xl">
               Find the next Roblox game{' '}
               <span className="bg-gradient-to-r from-rbx-red via-rbx-red to-rbx-orange bg-clip-text text-transparent">
                 everyone is talking about
               </span>
             </h1>
-            <p className="mt-4 text-base text-rbx-muted leading-relaxed">
+            <p className="mt-6 text-base text-rbx-muted leading-relaxed max-w-lg">
               Discover curated Roblox experiences, inspect live player activity, and vote on the games you love.
             </p>
           </div>
           <Link
             href="/submit"
-            className="self-start shrink-0 rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange"
+            className="self-start shrink-0 rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-8 py-4 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange"
           >
             Submit a game →
           </Link>
         </div>
         {statusMessage ? (
-          <p className="relative mt-6 rounded-xl border border-rbx-border bg-rbx-surface-2 px-4 py-3 text-sm text-rbx-muted">{statusMessage}</p>
+          <p className="relative mt-8 rounded-xl border border-rbx-border bg-rbx-surface-2 px-5 py-4 text-sm text-rbx-muted">{statusMessage}</p>
         ) : null}
       </section>
 
-      <section className="space-y-8">
+      <section className="space-y-12">
         {/* Trending list */}
-        <div className="space-y-5">
-          <div className="flex items-center gap-3">
-            <div className="h-5 w-1 rounded-full bg-gradient-to-b from-rbx-red to-rbx-orange" />
-            <h2 className="text-base font-black uppercase tracking-widest text-white">Trending</h2>
-            <span className="text-xs text-rbx-muted">Fresh uploads · live stats</span>
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="h-6 w-1.5 rounded-full bg-gradient-to-b from-rbx-red to-rbx-orange" />
+            <div>
+              <h2 className="text-lg font-black uppercase tracking-widest text-white">Trending</h2>
+              <span className="text-xs text-rbx-muted">Fresh uploads · live stats</span>
+            </div>
           </div>
 
           {loading ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-36 animate-pulse rounded-2xl border border-rbx-border bg-rbx-surface" />
+                <div key={i} className="h-40 animate-pulse rounded-2xl border border-rbx-border bg-rbx-surface" />
               ))}
             </div>
           ) : !games.length ? (
-            <div className="rounded-2xl border border-rbx-border bg-rbx-surface p-6">
+            <div className="rounded-2xl border border-rbx-border bg-rbx-surface p-8">
               <h3 className="text-lg font-bold text-white">No games have been shared yet.</h3>
-              <p className="mt-2 text-sm text-rbx-muted">Be the first to submit a Roblox game to start the rankings.</p>
+              <p className="mt-3 text-sm text-rbx-muted">Be the first to submit a Roblox game to start the rankings.</p>
               <Link
                 href="/submit"
-                className="mt-4 inline-flex rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-2 text-sm font-bold text-white transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-rbx-orange"
+                className="mt-6 inline-flex rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-5 py-3 text-sm font-bold text-white transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-rbx-orange"
               >
                 Submit a game →
               </Link>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {games.map((game, idx) => {
                 const metadata = metadataMap[game.id];
                 const userVote = votes[game.id];
                 return (
                   <article
                     key={game.id}
-                    className="group relative overflow-hidden rounded-2xl border border-rbx-border bg-rbx-surface transition hover:border-rbx-border hover:-translate-y-px"
+                    className="group relative overflow-hidden rounded-2xl border border-rbx-border bg-rbx-surface transition hover:border-rbx-border hover:bg-rbx-surface-2 hover:-translate-y-px"
                   >
                     {/* Gradient left accent strip */}
-                    <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-rbx-purple via-rbx-red to-rbx-orange" />
+                    <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-rbx-purple via-rbx-red to-rbx-orange" />
 
-                    <div className="flex flex-col gap-4 pl-5 pr-5 py-5 sm:flex-row">
+                    <div className="flex flex-col gap-5 pl-6 pr-6 py-6 sm:flex-row sm:items-center">
                       {/* Rank */}
-                      <div className="hidden sm:flex shrink-0 w-6 items-start justify-center pt-1">
-                        <span className="text-xs font-black text-rbx-muted">#{idx + 1}</span>
+                      <div className="hidden sm:flex shrink-0 w-8 items-start justify-center pt-1">
+                        <span className="text-sm font-black text-rbx-muted">#{idx + 1}</span>
                       </div>
 
                       {/* Thumbnail */}
-                      <div className="h-28 w-full shrink-0 overflow-hidden rounded-xl bg-rbx-surface-3 sm:w-36">
+                      <div className="h-32 w-full shrink-0 overflow-hidden rounded-xl bg-rbx-surface-3 sm:w-40">
                         {metadata?.thumbnail_url ? (
                           <img
                             src={metadata.thumbnail_url}
@@ -233,57 +236,57 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
                             className="h-full w-full object-cover"
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-rbx-surface-2 to-rbx-surface-3 text-xs font-black text-rbx-muted">RBX</div>
+                          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-rbx-surface-2 to-rbx-surface-3 text-sm font-black text-rbx-muted">RBX</div>
                         )}
                       </div>
 
                       {/* Content */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-start justify-between gap-2">
-                          <h3 className="text-base font-bold text-white leading-tight">{metadata?.title || game.title}</h3>
-                          <span className="text-xs text-rbx-muted shrink-0">{dateFormatter.format(new Date(game.created_at))}</span>
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <h3 className="text-lg font-bold text-white leading-tight">{metadata?.title || game.title}</h3>
+                          <span className="text-xs text-rbx-muted shrink-0 pt-1">{dateFormatter.format(new Date(game.created_at))}</span>
                         </div>
-                        <p className="mt-1 text-sm text-rbx-muted line-clamp-2 leading-relaxed">{metadata?.description || game.description}</p>
+                        <p className="mt-2 text-sm text-rbx-muted line-clamp-2 leading-relaxed">{metadata?.description || game.description}</p>
 
-                        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-                          <span className="rounded-lg border border-rbx-border bg-rbx-surface-2 px-2.5 py-1 text-white font-medium">
+                        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+                          <span className="rounded-lg border border-rbx-border bg-rbx-surface-2 px-3 py-1.5 text-white font-medium">
                             👥 {formatStat(metadata?.player_count)}
                           </span>
-                          <span className="rounded-lg border border-rbx-border bg-rbx-surface-2 px-2.5 py-1 text-white font-medium">
+                          <span className="rounded-lg border border-rbx-border bg-rbx-surface-2 px-3 py-1.5 text-white font-medium">
                             🎮 {formatStat(metadata?.visits)}
                           </span>
                         </div>
 
-                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <div className="mt-4 flex flex-wrap items-center gap-3">
                           {/* Vote widget */}
                           <div className="flex items-center overflow-hidden rounded-lg border border-rbx-border bg-rbx-surface-2">
                             <button
                               type="button"
                               aria-label={`Upvote ${metadata?.title || game.title}`}
                               onClick={() => handleVote(game.id, 1)}
-                              className={`px-3 py-1.5 text-sm font-bold transition hover:bg-rbx-surface-3 focus-visible:ring-2 focus-visible:ring-rbx-orange ${userVote?.value === 1 ? 'text-rbx-orange' : 'text-rbx-muted'}`}
+                              className={`px-4 py-2 text-sm font-bold transition hover:bg-rbx-surface-3 focus-visible:ring-2 focus-visible:ring-rbx-orange ${userVote?.value === 1 ? 'text-rbx-orange' : 'text-rbx-muted'}`}
                             >▲</button>
-                            <span className="border-x border-rbx-border px-3 py-1.5 text-sm font-black text-white min-w-[2rem] text-center">
+                            <span className="border-x border-rbx-border px-4 py-2 text-sm font-black text-white min-w-[2.5rem] text-center">
                               {userVote?.value ?? 0}
                             </span>
                             <button
                               type="button"
                               aria-label={`Downvote ${metadata?.title || game.title}`}
                               onClick={() => handleVote(game.id, -1)}
-                              className={`px-3 py-1.5 text-sm font-bold transition hover:bg-rbx-surface-3 focus-visible:ring-2 focus-visible:ring-rbx-orange ${userVote?.value === -1 ? 'text-rbx-red' : 'text-rbx-muted'}`}
+                              className={`px-4 py-2 text-sm font-bold transition hover:bg-rbx-surface-3 focus-visible:ring-2 focus-visible:ring-rbx-orange ${userVote?.value === -1 ? 'text-rbx-red' : 'text-rbx-muted'}`}
                             >▼</button>
                           </div>
                           <a
                             href={game.roblox_url}
                             target="_blank"
                             rel="noreferrer"
-                            className="rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-1.5 text-xs font-bold text-white transition hover:opacity-90"
+                            className="rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-5 py-2 text-xs font-bold text-white transition hover:opacity-90"
                           >
                             ▶ Play
                           </a>
                           <Link
                             href={`/game/${game.id}`}
-                            className="rounded-lg border border-rbx-border px-4 py-1.5 text-xs font-semibold text-rbx-muted transition hover:text-white hover:border-white/20 focus-visible:ring-2 focus-visible:ring-rbx-orange"
+                            className="rounded-lg border border-rbx-border px-5 py-2 text-xs font-semibold text-rbx-muted transition hover:text-white hover:border-white/20 focus-visible:ring-2 focus-visible:ring-rbx-orange"
                           >
                             Details
                           </Link>
@@ -298,37 +301,37 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
         </div>
 
         {/* Recent games */}
-        <div className="space-y-5">
-          <div className="flex items-center gap-3">
-            <div className="h-5 w-1 rounded-full bg-gradient-to-b from-rbx-purple to-rbx-red" />
-            <h2 className="text-base font-black uppercase tracking-widest text-white">Recent</h2>
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="h-6 w-1.5 rounded-full bg-gradient-to-b from-rbx-purple to-rbx-red" />
+            <h2 className="text-lg font-black uppercase tracking-widest text-white">Recent</h2>
           </div>
 
-          <div className="flex gap-3 overflow-x-auto pb-1">
+          <div className="flex gap-4 overflow-x-auto pb-2 pr-4">
             {(games.length ? games.slice(0, 5) : []).map((game, idx) => (
               <article
                 key={`${game.id}-recent`}
-                className="min-w-[240px] rounded-xl border border-rbx-border bg-rbx-surface p-4 transition hover:bg-rbx-surface-2"
+                className="min-w-[260px] rounded-xl border border-rbx-border bg-rbx-surface p-5 transition hover:bg-rbx-surface-2"
               >
-                <span className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br from-rbx-red to-rbx-orange text-[10px] font-black text-white">
+                <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-rbx-red to-rbx-orange text-[11px] font-black text-white">
                   {idx + 1}
                 </span>
-                <div className="mt-2 min-w-0">
+                <div className="mt-3 min-w-0">
                   <p className="truncate text-sm font-bold text-white">{game.title}</p>
-                  <p className="mt-0.5 line-clamp-2 text-xs text-rbx-muted leading-relaxed">{game.description}</p>
+                  <p className="mt-1 line-clamp-2 text-xs text-rbx-muted leading-relaxed">{game.description}</p>
                 </div>
               </article>
             ))}
           </div>
 
           {/* Submit CTA card */}
-          <div className="relative overflow-hidden rounded-2xl border border-rbx-border bg-rbx-surface p-5">
+          <div className="relative overflow-hidden rounded-2xl border border-rbx-border bg-rbx-surface p-8">
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-rbx-purple/20 via-rbx-red/10 to-transparent" />
-            <p className="relative text-sm font-black text-white">Got a hidden gem?</p>
-            <p className="relative mt-1 text-xs text-rbx-muted">Share your Roblox game with the community.</p>
+            <p className="relative text-base font-black text-white">Got a hidden gem?</p>
+            <p className="relative mt-2 text-sm text-rbx-muted">Share your Roblox game with the community.</p>
             <Link
               href="/submit"
-              className="relative mt-4 inline-block rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-2 text-xs font-bold text-white transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-rbx-orange"
+              className="relative mt-6 inline-block rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-5 py-3 text-sm font-bold text-white transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-rbx-orange"
             >
               Submit a game →
             </Link>

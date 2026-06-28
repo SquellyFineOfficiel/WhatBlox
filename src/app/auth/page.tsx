@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import Image from 'next/image';
 
 export default function AuthPage() {
   const [loading, setLoading] = useState(false);
@@ -33,46 +34,102 @@ export default function AuthPage() {
   };
 
   return (
-    <main className="mx-auto flex max-w-4xl items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
-      <div className="w-full max-w-lg rounded-2xl border border-rbx-border bg-rbx-surface p-8">
-        <div className="mb-6">
-          <span className="inline-block rounded-md bg-gradient-to-r from-rbx-red to-rbx-orange px-3 py-1 text-[11px] font-black uppercase tracking-widest text-white">
-            Roblox sign in
-          </span>
-          <h1 className="mt-4 text-2xl font-black tracking-tight text-white">Continue with your Roblox account</h1>
-          <p className="mt-3 text-sm leading-6 text-rbx-muted">Only Roblox OAuth sign-in is available here. This keeps the experience fast, simple, and aligned with the Roblox identity.</p>
+    <main className="mx-auto flex min-h-screen max-w-4xl items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">
+        {/* Info Card */}
+        <div className="rounded-2xl border border-rbx-border bg-rbx-surface/50 p-8 backdrop-blur">
+          {/* Header Badge */}
+          <div className="mb-8">
+            <span className="inline-block rounded-md bg-gradient-to-r from-rbx-red to-rbx-orange px-3 py-1 text-[11px] font-black uppercase tracking-widest text-white">
+              Secure Sign In
+            </span>
+          </div>
+
+          {/* Main Heading */}
+          <h1 className="text-3xl font-black tracking-tight text-white mb-2">
+            Sign in to WhatBlox
+          </h1>
+          <p className="text-sm leading-6 text-rbx-muted mb-6">
+            Use your Roblox account to access WhatBlox. No password needed, no bots.
+          </p>
+
+          {/* Benefits Section */}
+          <div className="space-y-3 mb-8 rounded-xl border border-rbx-border bg-rbx-surface-2 p-4">
+            <div className="flex items-start gap-3">
+              <span className="text-rbx-orange mt-0.5">✓</span>
+              <div>
+                <p className="text-sm font-semibold text-white">One-Click Login</p>
+                <p className="text-xs text-rbx-muted">Approve on Roblox and you're in</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="text-rbx-orange mt-0.5">✓</span>
+              <div>
+                <p className="text-sm font-semibold text-white">No Passwords</p>
+                <p className="text-xs text-rbx-muted">Your Roblox account is your password</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="text-rbx-orange mt-0.5">✓</span>
+              <div>
+                <p className="text-sm font-semibold text-white">Bot-Free</p>
+                <p className="text-xs text-rbx-muted">Real Roblox accounts only</p>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA Button */}
+          <button
+            type="button"
+            onClick={handleRobloxLogin}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Image
+              src="/branding/roblox-logo.svg"
+              alt="Roblox logo"
+              width={20}
+              height={20}
+              className="h-5 w-5"
+            />
+            {loading ? 'Connecting to Roblox…' : 'Continue with Roblox'}
+          </button>
+
+          {/* Legal Text */}
+          <p className="mt-6 text-xs leading-5 text-rbx-muted text-center">
+            By continuing, you agree to the{' '}
+            <Link href="/terms-of-service" className="text-white underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-rbx-orange">
+              Terms of Service
+            </Link>
+            {' '}and{' '}
+            <Link href="/privacy-policy" className="text-white underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-rbx-orange">
+              Privacy Policy
+            </Link>
+            .
+          </p>
+
+          {/* Error Messages */}
+          <div aria-live="polite">
+            {message && (
+              <div className="mt-6 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                {message}
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="rounded-xl border border-rbx-border bg-rbx-surface-2 p-4 text-sm">
-          <p className="font-bold text-white">What happens next</p>
-          <p className="mt-1 text-rbx-muted">You will be sent to Roblox to approve access, then returned to WhatBlox.</p>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleRobloxLogin}
-          disabled={loading}
-          className="mt-6 flex w-full items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <span className="text-base font-black">R</span>
-          {loading ? 'Connecting to Roblox…' : 'Continue with Roblox'}
-        </button>
-
-        <p className="mt-4 text-xs leading-5 text-rbx-muted">
-          By continuing, you agree to the{' '}
-          <Link href="/terms-of-service" className="text-white underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-rbx-orange">
-            Terms of Service
-          </Link>{' '}
-          and{' '}
-          <Link href="/privacy-policy" className="text-white underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-rbx-orange">
-            Privacy Policy
-          </Link>
-          .
+        {/* Footer Info */}
+        <p className="mt-8 text-center text-xs text-rbx-muted">
+          Don't have a Roblox account?{' '}
+          <a
+            href="https://www.roblox.com/login"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-rbx-orange hover:underline focus-visible:ring-2 focus-visible:ring-rbx-orange rounded"
+          >
+            Create one free
+          </a>
         </p>
-
-        <div aria-live="polite">
-          {message ? <p className="mt-4 rounded-xl border border-rbx-border bg-rbx-surface-2 px-4 py-3 text-sm text-rbx-muted">{message}</p> : null}
-        </div>
       </div>
     </main>
   );
