@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/src/lib/supabase/client';
+import { getClientUser } from '@/src/lib/auth-client';
 import AdminSidebar from '@/src/components/admin-sidebar';
 import type { AdminRole } from '@/src/lib/admin';
 
@@ -28,27 +29,18 @@ export default function ManageAdminsPage() {
       if (!supabase) return;
 
       try {
-        // Get current user role
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          // Get the user's Roblox ID from profiles table
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('id', user.id)
+        // Get current user's Roblox ID from cookies
+        const clientUser = getClientUser();
+        if (clientUser) {
+          // Query admin_users with the Roblox ID
+          const { data: adminUser } = await supabase
+            .from('admin_users')
+            .select('role')
+            .eq('id', clientUser.id)
             .single();
-
-          if (profile) {
-            // Now query admin_users with the correct ID
-            const { data: adminUser } = await supabase
-              .from('admin_users')
-              .select('role')
-              .eq('id', profile.id)
-              .single();
-            
-            if (adminUser) {
-              setUserRole(adminUser.role as AdminRole);
-            }
+          
+          if (adminUser) {
+            setUserRole(adminUser.role as AdminRole);
           }
         }
 
