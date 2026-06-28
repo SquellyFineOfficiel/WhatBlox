@@ -28,6 +28,20 @@ export default function BanGamesPage() {
       const supabase = createClient();
       if (!supabase) return;
 
+      // Get current user role
+      const { data: authData } = await supabase.auth.getUser();
+      if (authData.user) {
+        const { data: adminUser } = await supabase
+          .from('admin_users')
+          .select('role')
+          .eq('id', authData.user.id)
+          .single();
+
+        if (adminUser) {
+          setUserRole(adminUser.role as AdminRole);
+        }
+      }
+
       const { data } = await supabase
         .from('games')
         .select('id,title,roblox_url,banned_at,ban_reason')

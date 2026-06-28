@@ -29,6 +29,20 @@ export default function LogsPage() {
         return;
       }
 
+      // Get current user role
+      const { data: authData } = await supabase.auth.getUser();
+      if (authData.user) {
+        const { data: adminUser } = await supabase
+          .from('admin_users')
+          .select('role')
+          .eq('id', authData.user.id)
+          .single();
+
+        if (adminUser) {
+          setUserRole(adminUser.role as AdminRole);
+        }
+      }
+
       let query = supabase.from('moderation_logs').select('*').order('created_at', { ascending: false }).limit(100);
 
       if (filter !== 'all') {

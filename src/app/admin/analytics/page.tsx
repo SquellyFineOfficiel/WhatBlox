@@ -29,6 +29,20 @@ export default function AnalyticsPage() {
       }
 
       try {
+        // Get current user role
+        const { data: authData } = await supabase.auth.getUser();
+        if (authData.user) {
+          const { data: adminUser } = await supabase
+            .from('admin_users')
+            .select('role')
+            .eq('id', authData.user.id)
+            .single();
+
+          if (adminUser) {
+            setUserRole(adminUser.role as AdminRole);
+          }
+        }
+
         // Get game stats
         const { count: totalGames } = await supabase.from('games').select('id', { count: 'exact' });
         const { count: approvedGames } = await supabase

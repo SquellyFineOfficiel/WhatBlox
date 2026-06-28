@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/src/lib/supabase/client';
 import AdminSidebar from '@/src/components/admin-sidebar';
 import type { AdminRole } from '@/src/lib/admin';
@@ -12,6 +12,28 @@ export default function BanUsersPage() {
   const [expiresIn, setExpiresIn] = useState('permanent');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadUserRole = async () => {
+      const supabase = createClient();
+      if (!supabase) return;
+
+      const { data: authData } = await supabase.auth.getUser();
+      if (authData.user) {
+        const { data: adminUser } = await supabase
+          .from('admin_users')
+          .select('role')
+          .eq('id', authData.user.id)
+          .single();
+
+        if (adminUser) {
+          setUserRole(adminUser.role as AdminRole);
+        }
+      }
+    };
+
+    loadUserRole();
+  }, []);
 
   const handleBanUser = async (e: React.FormEvent) => {
     e.preventDefault();

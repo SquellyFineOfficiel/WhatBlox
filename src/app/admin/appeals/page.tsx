@@ -25,11 +25,25 @@ export default function AppealsPage() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    const loadAppeals = async () => {
+    const loadData = async () => {
       const supabase = createClient();
       if (!supabase) {
         setLoading(false);
         return;
+      }
+
+      // Get current user role
+      const { data: authData } = await supabase.auth.getUser();
+      if (authData.user) {
+        const { data: adminUser } = await supabase
+          .from('admin_users')
+          .select('role')
+          .eq('id', authData.user.id)
+          .single();
+
+        if (adminUser) {
+          setUserRole(adminUser.role as AdminRole);
+        }
       }
 
       const { data } = await supabase
@@ -44,7 +58,7 @@ export default function AppealsPage() {
       setLoading(false);
     };
 
-    loadAppeals();
+    loadData();
   }, []);
 
   const handleApproveAppeal = async (appealId: string) => {
