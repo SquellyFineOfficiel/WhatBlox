@@ -13,6 +13,8 @@ type PendingGame = {
   user_id: string;
 };
 
+const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
+
 export default async function AdminQueuePage() {
   const supabase = await createClient();
 
@@ -45,21 +47,30 @@ export default async function AdminQueuePage() {
                 <div>
                   <h2 className="text-lg font-bold text-white">{game.title}</h2>
                   <p className="mt-2 max-w-3xl text-sm leading-6 text-rbx-muted">{game.description}</p>
-                  <p className="mt-3 text-xs text-rbx-muted">Submitted {new Date(game.created_at).toLocaleDateString()}</p>
+                  <p className="mt-3 text-xs text-rbx-muted">Submitted {dateFormatter.format(new Date(game.created_at))}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <form action={`/admin/queue/${game.id}/approve`} method="post">
-                    <button type="submit" className="rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-2 text-sm font-bold text-white transition hover:opacity-90">
+                    <button type="submit" className="rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-2 text-sm font-bold text-white transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-rbx-orange">
                       Approve
                     </button>
                   </form>
                   <form action={`/admin/queue/${game.id}/reject`} method="post" className="flex flex-col gap-2">
-                    <textarea name="reason" rows={2} placeholder="Rejection reason" className="w-56 rounded-xl border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white outline-none placeholder-rbx-muted" />
-                    <button type="submit" className="rounded-xl border border-rbx-border px-4 py-2 text-sm font-semibold text-rbx-muted transition hover:text-white">
+                    <label className="text-xs font-semibold text-rbx-muted">
+                      Rejection reason
+                      <textarea
+                        name="reason"
+                        rows={2}
+                        required
+                        autoComplete="off"
+                        className="mt-1 w-56 rounded-xl border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white transition focus:border-rbx-red focus-visible:ring-2 focus-visible:ring-rbx-red"
+                      />
+                    </label>
+                    <button type="submit" className="rounded-xl border border-rbx-border px-4 py-2 text-sm font-semibold text-rbx-muted transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">
                       Reject
                     </button>
                   </form>
-                  <Link href={`/game/${game.id}`} className="rounded-xl border border-rbx-border px-4 py-2 text-sm font-semibold text-rbx-muted transition hover:text-white">
+                  <Link href={`/game/${game.id}`} className="rounded-xl border border-rbx-border px-4 py-2 text-sm font-semibold text-rbx-muted transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">
                     Open
                   </Link>
                 </div>

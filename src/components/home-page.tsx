@@ -25,35 +25,10 @@ type HomePageProps = {
   isConfigured: boolean;
 };
 
-const fallbackGames: Game[] = [
-  {
-    id: 'demo-1',
-    title: 'Skybound Adventures',
-    description: 'A cozy open-world quest with handcrafted islands and weekly events.',
-    roblox_url: 'https://www.roblox.com/games/3156446448/Retro-Highway',
-    created_at: '2026-06-01T12:00:00.000Z',
-    user_id: 'demo',
-  },
-  {
-    id: 'demo-2',
-    title: 'Pixel Harbor',
-    description: 'A social building game where players trade stories and custom decorations.',
-    roblox_url: 'https://www.roblox.com/games/5733534014/Tower-of-Hell',
-    created_at: '2026-06-10T10:30:00.000Z',
-    user_id: 'demo',
-  },
-  {
-    id: 'demo-3',
-    title: 'Neon Drift',
-    description: 'A fast arcade racing experience with original music and daily challenges.',
-    roblox_url: 'https://www.roblox.com/games/8540346411/Speed-Run-4',
-    created_at: '2026-06-15T08:45:00.000Z',
-    user_id: 'demo',
-  },
-];
+const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
 
 export default function HomePage({ user, isConfigured }: HomePageProps) {
-  const [games, setGames] = useState<Game[]>(fallbackGames);
+  const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [votes, setVotes] = useState<Record<string, Vote>>({});
   const [statusMessage, setStatusMessage] = useState('');
@@ -72,19 +47,20 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
         setClientUser({ id: data.user.id });
       }
     });
+
     async function loadGames() {
       if (!isConfigured) {
-        setGames(fallbackGames);
+        setGames([]);
         setLoading(false);
-        setStatusMessage('Supabase is not configured yet, so you are viewing sample games.');
+        setStatusMessage('Live game data is unavailable until Supabase is configured.');
         return;
       }
 
       const supabase = createClient();
       if (!supabase) {
-        setGames(fallbackGames);
+        setGames([]);
         setLoading(false);
-        setStatusMessage('Supabase is not configured yet, so you are viewing sample games.');
+        setStatusMessage('Live game data is unavailable until Supabase is configured.');
         return;
       }
 
@@ -101,8 +77,8 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
           setVotes(voteMap);
         }
       } else {
-        setGames(fallbackGames);
-        setStatusMessage('Live data was unavailable, so the preview uses sample games.');
+        setGames([]);
+        setStatusMessage('Live data is temporarily unavailable. Please try again soon.');
       }
       setLoading(false);
     }
@@ -190,7 +166,7 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
           </div>
           <Link
             href="/submit"
-            className="self-start shrink-0 rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95"
+            className="self-start shrink-0 rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange"
           >
             Submit a game →
           </Link>
@@ -215,6 +191,17 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
                 <div key={i} className="h-36 animate-pulse rounded-2xl border border-rbx-border bg-rbx-surface" />
               ))}
             </div>
+          ) : !games.length ? (
+            <div className="rounded-2xl border border-rbx-border bg-rbx-surface p-6">
+              <h3 className="text-lg font-bold text-white">No games have been shared yet.</h3>
+              <p className="mt-2 text-sm text-rbx-muted">Be the first to submit a Roblox game to start the rankings.</p>
+              <Link
+                href="/submit"
+                className="mt-4 inline-flex rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-2 text-sm font-bold text-white transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-rbx-orange"
+              >
+                Submit a game →
+              </Link>
+            </div>
           ) : (
             <div className="space-y-3">
               {games.map((game, idx) => {
@@ -237,7 +224,14 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
                       {/* Thumbnail */}
                       <div className="h-28 w-full shrink-0 overflow-hidden rounded-xl bg-rbx-surface-3 sm:w-36">
                         {metadata?.thumbnail_url ? (
-                          <img src={metadata.thumbnail_url} alt={game.title} className="h-full w-full object-cover" />
+                          <img
+                            src={metadata.thumbnail_url}
+                            alt={game.title}
+                            width={640}
+                            height={360}
+                            loading="lazy"
+                            className="h-full w-full object-cover"
+                          />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-rbx-surface-2 to-rbx-surface-3 text-xs font-black text-rbx-muted">RBX</div>
                         )}
@@ -247,7 +241,7 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-start justify-between gap-2">
                           <h3 className="text-base font-bold text-white leading-tight">{metadata?.title || game.title}</h3>
-                          <span className="text-xs text-rbx-muted shrink-0">{new Date(game.created_at).toLocaleDateString()}</span>
+                          <span className="text-xs text-rbx-muted shrink-0">{dateFormatter.format(new Date(game.created_at))}</span>
                         </div>
                         <p className="mt-1 text-sm text-rbx-muted line-clamp-2 leading-relaxed">{metadata?.description || game.description}</p>
 
@@ -264,15 +258,19 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
                           {/* Vote widget */}
                           <div className="flex items-center overflow-hidden rounded-lg border border-rbx-border bg-rbx-surface-2">
                             <button
+                              type="button"
+                              aria-label={`Upvote ${metadata?.title || game.title}`}
                               onClick={() => handleVote(game.id, 1)}
-                              className={`px-3 py-1.5 text-sm font-bold transition hover:bg-rbx-surface-3 ${userVote?.value === 1 ? 'text-rbx-orange' : 'text-rbx-muted'}`}
+                              className={`px-3 py-1.5 text-sm font-bold transition hover:bg-rbx-surface-3 focus-visible:ring-2 focus-visible:ring-rbx-orange ${userVote?.value === 1 ? 'text-rbx-orange' : 'text-rbx-muted'}`}
                             >▲</button>
                             <span className="border-x border-rbx-border px-3 py-1.5 text-sm font-black text-white min-w-[2rem] text-center">
                               {userVote?.value ?? 0}
                             </span>
                             <button
+                              type="button"
+                              aria-label={`Downvote ${metadata?.title || game.title}`}
                               onClick={() => handleVote(game.id, -1)}
-                              className={`px-3 py-1.5 text-sm font-bold transition hover:bg-rbx-surface-3 ${userVote?.value === -1 ? 'text-rbx-red' : 'text-rbx-muted'}`}
+                              className={`px-3 py-1.5 text-sm font-bold transition hover:bg-rbx-surface-3 focus-visible:ring-2 focus-visible:ring-rbx-orange ${userVote?.value === -1 ? 'text-rbx-red' : 'text-rbx-muted'}`}
                             >▼</button>
                           </div>
                           <a
@@ -285,7 +283,7 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
                           </a>
                           <Link
                             href={`/game/${game.id}`}
-                            className="rounded-lg border border-rbx-border px-4 py-1.5 text-xs font-semibold text-rbx-muted transition hover:text-white hover:border-white/20"
+                            className="rounded-lg border border-rbx-border px-4 py-1.5 text-xs font-semibold text-rbx-muted transition hover:text-white hover:border-white/20 focus-visible:ring-2 focus-visible:ring-rbx-orange"
                           >
                             Details
                           </Link>
@@ -307,7 +305,7 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
           </div>
 
           <div className="flex gap-3 overflow-x-auto pb-1">
-            {games.slice(0, 5).map((game, idx) => (
+            {(games.length ? games.slice(0, 5) : []).map((game, idx) => (
               <article
                 key={`${game.id}-recent`}
                 className="min-w-[240px] rounded-xl border border-rbx-border bg-rbx-surface p-4 transition hover:bg-rbx-surface-2"
@@ -330,7 +328,7 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
             <p className="relative mt-1 text-xs text-rbx-muted">Share your Roblox game with the community.</p>
             <Link
               href="/submit"
-              className="relative mt-4 inline-block rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-2 text-xs font-bold text-white transition hover:opacity-90"
+              className="relative mt-4 inline-block rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-2 text-xs font-bold text-white transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-rbx-orange"
             >
               Submit a game →
             </Link>

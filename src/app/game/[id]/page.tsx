@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { createClient } from '@/src/lib/supabase/server';
 import { formatStat, getRobloxGameMetadata } from '@/src/lib/roblox';
 
+const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
+
 export default async function GamePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
@@ -35,7 +37,7 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
 
         <div className="relative overflow-hidden p-8">
           <div className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-gradient-to-br from-rbx-purple/20 to-rbx-red/10 blur-3xl" />
-          <Link href="/" className="relative text-sm font-semibold text-rbx-muted transition hover:text-white">← Back home</Link>
+          <Link href="/" className="relative rounded-md text-sm font-semibold text-rbx-muted transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">← Back home</Link>
           <div className="relative mt-6 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <span className="inline-block rounded-md bg-gradient-to-r from-rbx-purple to-rbx-red px-3 py-1 text-[11px] font-black uppercase tracking-widest text-white">
@@ -48,7 +50,7 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
               href={game.roblox_url}
               target="_blank"
               rel="noreferrer"
-              className="self-start rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-5 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95"
+              className="self-start rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-5 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange"
             >
               ▶ Play on Roblox
             </a>
@@ -58,7 +60,14 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
         <div className="grid gap-6 p-8 pt-0 lg:grid-cols-[0.8fr_1.2fr]">
           <div className="overflow-hidden rounded-xl border border-rbx-border bg-rbx-surface-3">
             {metadata?.thumbnail_url ? (
-              <img src={metadata.thumbnail_url} alt={metadata.title || game.title} className="h-full w-full object-cover" />
+              <img
+                src={metadata.thumbnail_url}
+                alt={metadata.title || game.title}
+                width={640}
+                height={360}
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
             ) : (
               <div className="flex h-60 items-center justify-center text-sm font-bold text-rbx-muted">Roblox thumbnail unavailable</div>
             )}
@@ -67,7 +76,7 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
             <div className="flex flex-wrap gap-3">
               <span className="rounded-xl border border-rbx-border bg-rbx-surface-2 px-3 py-2 text-xs font-bold text-white">👥 {formatStat(metadata?.player_count)} playing</span>
               <span className="rounded-xl border border-rbx-border bg-rbx-surface-2 px-3 py-2 text-xs font-bold text-white">🎮 {formatStat(metadata?.visits)} visits</span>
-              <span className="rounded-xl border border-rbx-border bg-rbx-surface-2 px-3 py-2 text-xs font-semibold text-rbx-muted">Submitted {new Date(game.created_at).toLocaleDateString()}</span>
+              <span className="rounded-xl border border-rbx-border bg-rbx-surface-2 px-3 py-2 text-xs font-semibold text-rbx-muted">Submitted {dateFormatter.format(new Date(game.created_at))}</span>
             </div>
             <div className="relative overflow-hidden rounded-xl border border-rbx-border bg-rbx-surface-2 p-5">
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-rbx-purple/10 via-transparent to-transparent" />

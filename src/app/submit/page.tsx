@@ -69,8 +69,8 @@ export default function SubmitPage() {
     }
 
     const { error } = await supabase.from('games').insert({
-      title: title || metadata?.title || 'Untitled Roblox game',
-      description: description || metadata?.description || 'A fresh Roblox experience from the community.',
+      title: title.trim(),
+      description: description.trim(),
       roblox_url: robloxUrl,
       user_id: user.id,
     });
@@ -99,18 +99,44 @@ export default function SubmitPage() {
           <form onSubmit={handleSubmit} className="grid gap-5">
             <label className="block text-sm font-bold text-white">
               Roblox URL
-              <input required type="url" value={robloxUrl} onChange={(event) => setRobloxUrl(event.target.value)} className="mt-1.5 w-full rounded-xl border border-rbx-border bg-rbx-surface-2 px-3 py-3 text-white placeholder-rbx-muted outline-none transition focus:border-rbx-red" />
+              <input
+                required
+                type="url"
+                name="robloxUrl"
+                autoComplete="off"
+                inputMode="url"
+                spellCheck={false}
+                value={robloxUrl}
+                onChange={(event) => setRobloxUrl(event.target.value)}
+                className="mt-1.5 w-full rounded-xl border border-rbx-border bg-rbx-surface-2 px-3 py-3 text-white transition focus:border-rbx-red focus-visible:ring-2 focus-visible:ring-rbx-red"
+              />
             </label>
             <label className="block text-sm font-bold text-white">
               Title
-              <input required value={title} onChange={(event) => setTitle(event.target.value)} className="mt-1.5 w-full rounded-xl border border-rbx-border bg-rbx-surface-2 px-3 py-3 text-white placeholder-rbx-muted outline-none transition focus:border-rbx-red" />
+              <input
+                required
+                name="title"
+                autoComplete="off"
+                spellCheck={false}
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                className="mt-1.5 w-full rounded-xl border border-rbx-border bg-rbx-surface-2 px-3 py-3 text-white transition focus:border-rbx-red focus-visible:ring-2 focus-visible:ring-rbx-red"
+              />
             </label>
             <label className="block text-sm font-bold text-white">
               Description
-              <textarea required rows={5} value={description} onChange={(event) => setDescription(event.target.value)} className="mt-1.5 w-full rounded-xl border border-rbx-border bg-rbx-surface-2 px-3 py-3 text-white placeholder-rbx-muted outline-none transition focus:border-rbx-red" />
+              <textarea
+                required
+                rows={5}
+                name="description"
+                autoComplete="off"
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+                className="mt-1.5 w-full rounded-xl border border-rbx-border bg-rbx-surface-2 px-3 py-3 text-white transition focus:border-rbx-red focus-visible:ring-2 focus-visible:ring-rbx-red"
+              />
             </label>
-            <button type="submit" disabled={loading} className="w-fit rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50">
-              {loading ? 'Submitting...' : 'Submit game →'}
+            <button type="submit" disabled={loading} className="w-fit rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange disabled:cursor-not-allowed disabled:opacity-50">
+              {loading ? 'Submitting…' : 'Submit game →'}
             </button>
           </form>
 
@@ -120,7 +146,14 @@ export default function SubmitPage() {
             {metadata ? (
               <div className="relative space-y-4">
                 {metadata.thumbnail_url ? (
-                  <img src={metadata.thumbnail_url} alt={metadata.title} className="h-40 w-full rounded-xl object-cover" />
+                  <img
+                    src={metadata.thumbnail_url}
+                    alt={metadata.title}
+                    width={640}
+                    height={360}
+                    loading="lazy"
+                    className="h-40 w-full rounded-xl object-cover"
+                  />
                 ) : (
                   <div className="flex h-40 items-center justify-center rounded-xl bg-rbx-surface-3 text-sm text-rbx-muted">Roblox thumbnail unavailable</div>
                 )}
@@ -141,7 +174,9 @@ export default function SubmitPage() {
           </aside>
         </div>
 
-        {message ? <p className="mt-6 rounded-xl border border-rbx-border bg-rbx-surface-2 px-4 py-3 text-sm text-rbx-muted">{message}</p> : null}
+        <div aria-live="polite">
+          {message ? <p className="mt-6 rounded-xl border border-rbx-border bg-rbx-surface-2 px-4 py-3 text-sm text-rbx-muted">{message}</p> : null}
+        </div>
       </div>
     </main>
   );

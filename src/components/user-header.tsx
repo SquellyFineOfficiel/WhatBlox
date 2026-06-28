@@ -31,10 +31,17 @@ export default function UserHeader() {
       {username ? (
         <Link
           href="/dashboard"
-          className="flex items-center gap-2 rounded-md px-1 py-0.5 font-semibold text-white transition hover:text-rbx-orange"
+          className="flex items-center gap-2 rounded-md px-1 py-0.5 font-semibold text-white transition hover:text-rbx-orange focus-visible:ring-2 focus-visible:ring-rbx-orange"
         >
           {avatarUrl ? (
-            <img src={avatarUrl} alt={username} className="h-7 w-7 rounded-md object-cover" />
+            <img
+              src={avatarUrl}
+              alt={username}
+              width={28}
+              height={28}
+              loading="lazy"
+              className="h-7 w-7 rounded-md object-cover"
+            />
           ) : (
             <span className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-rbx-red to-rbx-orange text-xs font-black text-white">
               {username.charAt(0).toUpperCase()}
@@ -43,7 +50,7 @@ export default function UserHeader() {
           <span>Dashboard</span>
         </Link>
       ) : (
-        <Link href="/auth" className="text-sm font-semibold text-rbx-muted transition hover:text-white">Sign in →</Link>
+        <Link href="/auth" className="rounded-md text-sm font-semibold text-rbx-muted transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">Sign in →</Link>
       )}
     </div>
   );

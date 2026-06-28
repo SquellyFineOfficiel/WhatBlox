@@ -16,6 +16,8 @@ type VoteRow = {
   value: number;
 };
 
+const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
+
 export default async function DashboardPage() {
   const supabase = await createClient();
 
@@ -38,7 +40,7 @@ export default async function DashboardPage() {
         <div className="rounded-2xl border border-rbx-border bg-rbx-surface p-8">
           <h1 className="text-2xl font-black text-white">Sign in required</h1>
           <p className="mt-3 text-sm text-rbx-muted">You need to connect your Roblox account to view your dashboard.</p>
-          <Link href="/auth" className="mt-6 inline-flex rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-5 py-3 text-sm font-bold text-white transition hover:opacity-90">
+          <Link href="/auth" className="mt-6 inline-flex rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-5 py-3 text-sm font-bold text-white transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-rbx-orange">
             Sign in
           </Link>
         </div>
@@ -125,10 +127,10 @@ export default async function DashboardPage() {
                       <span className="rounded-lg border border-rbx-border bg-rbx-surface px-2.5 py-1 text-white">▲ {stats.upvotes}</span>
                       <span className="rounded-lg border border-rbx-border bg-rbx-surface px-2.5 py-1 text-white">▼ {stats.downvotes}</span>
                       <span className="rounded-lg border border-rbx-border bg-rbx-surface px-2.5 py-1 text-white">Score {score}</span>
-                      <span className="rounded-lg border border-rbx-border bg-rbx-surface px-2.5 py-1 text-white">Submitted {new Date(game.created_at).toLocaleDateString()}</span>
+                      <span className="rounded-lg border border-rbx-border bg-rbx-surface px-2.5 py-1 text-white">Submitted {dateFormatter.format(new Date(game.created_at))}</span>
                     </div>
                   </div>
-                  <Link href={`/game/${game.id}`} className="rounded-xl border border-rbx-border px-4 py-2 text-sm font-semibold text-rbx-muted transition hover:text-white">
+                  <Link href={`/game/${game.id}`} className="rounded-xl border border-rbx-border px-4 py-2 text-sm font-semibold text-rbx-muted transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">
                     Open
                   </Link>
                 </div>

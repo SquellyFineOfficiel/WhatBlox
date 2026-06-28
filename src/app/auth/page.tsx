@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link';
 import { useState } from 'react';
 
 export default function AuthPage() {
@@ -51,15 +52,27 @@ export default function AuthPage() {
           type="button"
           onClick={handleRobloxLogin}
           disabled={loading}
-          className="mt-6 flex w-full items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-6 flex w-full items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span className="text-base font-black">R</span>
-          {loading ? 'Connecting to Roblox...' : 'Continue with Roblox'}
+          {loading ? 'Connecting to Roblox…' : 'Continue with Roblox'}
         </button>
 
-        <p className="mt-4 text-xs leading-5 text-rbx-muted">If Roblox OAuth is not enabled in your Supabase project, the button will show the provider error and you can enable it in the dashboard.</p>
+        <p className="mt-4 text-xs leading-5 text-rbx-muted">
+          By continuing, you agree to the{' '}
+          <Link href="/terms-of-service" className="text-white underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-rbx-orange">
+            Terms of Service
+          </Link>{' '}
+          and{' '}
+          <Link href="/privacy-policy" className="text-white underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-rbx-orange">
+            Privacy Policy
+          </Link>
+          .
+        </p>
 
-        {message ? <p className="mt-4 rounded-xl border border-rbx-border bg-rbx-surface-2 px-4 py-3 text-sm text-rbx-muted">{message}</p> : null}
+        <div aria-live="polite">
+          {message ? <p className="mt-4 rounded-xl border border-rbx-border bg-rbx-surface-2 px-4 py-3 text-sm text-rbx-muted">{message}</p> : null}
+        </div>
       </div>
     </main>
   );
