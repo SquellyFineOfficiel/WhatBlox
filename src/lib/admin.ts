@@ -16,7 +16,7 @@ export async function getAdminUser(): Promise<AdminUser | null> {
   const user = await getServerUser();
   if (!user) return null;
 
-  const { data: adminUser } = await adminClient.from('admin_users').select('id,role,permissions').eq('id', user.id).single();
+  const { data: adminUser } = await adminClient.from('admin_users').select('id,role,permissions').eq('id', user.id).maybeSingle();
 
   if (!adminUser) return null;
 
