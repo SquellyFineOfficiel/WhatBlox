@@ -32,14 +32,24 @@ export default function LogsPage() {
       // Get current user role
       const { data: authData } = await supabase.auth.getUser();
       if (authData.user) {
-        const { data: adminUser } = await supabase
-          .from('admin_users')
-          .select('role')
+        // Get the user's Roblox ID from profiles table
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
           .eq('id', authData.user.id)
           .single();
 
-        if (adminUser) {
-          setUserRole(adminUser.role as AdminRole);
+        if (profile) {
+          // Now query admin_users with the correct ID
+          const { data: adminUser } = await supabase
+            .from('admin_users')
+            .select('role')
+            .eq('id', profile.id)
+            .single();
+
+          if (adminUser) {
+            setUserRole(adminUser.role as AdminRole);
+          }
         }
       }
 
