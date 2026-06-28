@@ -1,15 +1,15 @@
 import { getServerUser } from '@/src/lib/auth-server';
 import { getAdminUser } from '@/src/lib/admin';
-import { createClient } from '@/src/lib/supabase/server';
+import { createAdminClient } from '@/src/lib/supabase/server';
 
 export default async function DebugPage() {
   const user = await getServerUser();
   const adminUser = await getAdminUser();
-  const supabase = await createClient();
+  const adminClient = createAdminClient();
 
   let adminUserRaw = null;
-  if (user && supabase) {
-    const { data } = await supabase.from('admin_users').select('*').eq('id', user.id).single();
+  if (user && adminClient) {
+    const { data } = await adminClient.from('admin_users').select('*').eq('id', user.id).single();
     adminUserRaw = data;
   }
 
