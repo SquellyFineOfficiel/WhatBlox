@@ -1,0 +1,1 @@
+truncate table public.votes, public.games, public.profiles restart identity cascade;
