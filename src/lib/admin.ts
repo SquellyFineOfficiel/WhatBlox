@@ -1,4 +1,5 @@
 import { createClient } from '@/src/lib/supabase/server';
+import { getServerUser } from '@/src/lib/auth-server';
 
 export type AdminRole = 'super_admin' | 'moderator' | 'reviewer';
 
@@ -12,10 +13,7 @@ export async function getAdminUser(): Promise<AdminUser | null> {
   const supabase = await createClient();
   if (!supabase) return null;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const user = await getServerUser();
   if (!user) return null;
 
   const { data: adminUser } = await supabase.from('admin_users').select('id,role,permissions').eq('id', user.id).single();
