@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getServerUser } from '@/src/lib/auth-server';
 import { createClient } from '@/src/lib/supabase/server';
 import { getAdminUser } from '@/src/lib/admin';
+import SendNotificationWidget from '@/src/components/send-notification-widget';
 
 type GameRow = {
   id: string;
@@ -120,6 +121,8 @@ export default async function DashboardPage() {
         </div>
 
         <div className="mt-12 space-y-5">
+          <SendNotificationWidget />
+
           {gameList.map((game) => {
             const stats = voteMap.get(game.id) ?? { upvotes: 0, downvotes: 0 };
             const score = stats.upvotes - stats.downvotes;

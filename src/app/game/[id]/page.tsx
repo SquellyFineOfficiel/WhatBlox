@@ -5,6 +5,7 @@ import { formatStat, getRobloxGameMetadata } from '@/src/lib/roblox';
 import ReviewsSection from '@/src/components/reviews-section';
 import CommentsSection from '@/src/components/comments-section';
 import AddToWishlistButton from '@/src/components/add-to-wishlist-button';
+import FollowGameButton from '@/src/components/follow-game-button';
 
 const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
 
@@ -14,11 +15,11 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
 
   if (!supabase) {
     return (
-      <main className="mx-auto max-w-4xl px-4 py-20 sm:px-6 lg:px-8">
-        <div className="rounded-3xl border border-rbx-border bg-rbx-surface p-10 md:p-12">
+      <main className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="rounded-2xl border border-rbx-border bg-rbx-surface p-8 md:p-10">
           <span className="inline-block rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-1.5 text-[11px] font-black uppercase tracking-widest text-white">Configuration needed</span>
-          <h1 className="mt-6 text-3xl font-black tracking-tight text-white">Supabase is not configured yet</h1>
-          <p className="mt-4 text-base leading-relaxed text-rbx-muted">Add your project URL and anon key to .env.local to enable game detail pages and live data.</p>
+          <h1 className="mt-4 text-2xl font-black tracking-tight text-white">Supabase is not configured yet</h1>
+          <p className="mt-3 text-sm leading-relaxed text-rbx-muted">Add your project URL and anon key to .env.local to enable game detail pages and live data.</p>
         </div>
       </main>
     );
@@ -33,38 +34,69 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
   const metadata = await getRobloxGameMetadata(game.roblox_url);
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-20 sm:px-6 lg:px-8">
-      <div className="overflow-hidden rounded-3xl border border-rbx-border bg-rbx-surface">
-        {/* Gradient top strip */}
-        <div className="h-1 w-full bg-gradient-to-r from-rbx-purple via-rbx-red to-rbx-orange" />
+    <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+      {/* Back Navigation */}
+      <Link href="/" className="inline-flex text-sm font-semibold text-rbx-muted transition hover:text-white mb-8 focus-visible:ring-2 focus-visible:ring-rbx-orange rounded-md">
+        ← Back to trending
+      </Link>
 
-        <div className="relative overflow-hidden p-10 md:p-12">
-          <div className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-gradient-to-br from-rbx-purple/20 to-rbx-red/10 blur-3xl" />
-          <Link href="/" className="relative rounded-md text-sm font-semibold text-rbx-muted transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">← Back home</Link>
-          <div className="relative mt-8 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <span className="inline-block rounded-lg bg-gradient-to-r from-rbx-purple to-rbx-red px-4 py-1.5 text-[11px] font-black uppercase tracking-widest text-white">
-                Roblox spotlight
+      {/* Hero Section with Thumbnail */}
+      <div className="mb-12 overflow-hidden rounded-2xl border border-rbx-border bg-rbx-surface">
+        <div className="h-1 w-full bg-gradient-to-r from-rbx-purple via-rbx-red to-rbx-orange" />
+        
+        <div className="relative grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:gap-10 p-8 md:p-10">
+          {/* Decorative gradient */}
+          <div className="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full bg-gradient-to-br from-rbx-purple/20 to-rbx-red/10 blur-3xl" />
+          
+          {/* Left: Content */}
+          <div className="relative min-w-0">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="inline-block rounded-lg bg-gradient-to-r from-rbx-purple to-rbx-red px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
+                Featured
               </span>
-              <h1 className="mt-4 text-4xl font-black tracking-tight text-white">{metadata?.title || game.title}</h1>
-              <p className="mt-4 max-w-2xl text-base leading-relaxed text-rbx-muted">{metadata?.description || game.description}</p>
             </div>
-            <div className="self-start flex gap-3">
+            
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white leading-tight mb-4">
+              {metadata?.title || game.title}
+            </h1>
+            
+            <p className="text-base text-rbx-muted leading-relaxed mb-8 max-w-xl">
+              {metadata?.description || game.description}
+            </p>
+
+            {/* Live Stats - Horizontal Layout */}
+            <div className="grid grid-cols-3 gap-3 mb-8">
+              <div className="rounded-lg border border-rbx-border bg-rbx-surface-2 px-4 py-3">
+                <div className="text-xs font-semibold text-rbx-muted mb-1">Players online</div>
+                <div className="text-lg font-black text-white">👥 {formatStat(metadata?.player_count)}</div>
+              </div>
+              <div className="rounded-lg border border-rbx-border bg-rbx-surface-2 px-4 py-3">
+                <div className="text-xs font-semibold text-rbx-muted mb-1">Total visits</div>
+                <div className="text-lg font-black text-white">🎮 {formatStat(metadata?.visits)}</div>
+              </div>
+              <div className="rounded-lg border border-rbx-border bg-rbx-surface-2 px-4 py-3">
+                <div className="text-xs font-semibold text-rbx-muted mb-1">Submitted</div>
+                <div className="text-sm font-black text-white">{dateFormatter.format(new Date(game.created_at))}</div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-3">
               <a
                 href={game.roblox_url}
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-8 py-4 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange"
+                className="rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-8 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange"
               >
-                ▶ Play on Roblox
+                ▶ Play Now
               </a>
               <AddToWishlistButton gameId={id} />
+              <FollowGameButton gameId={id} />
             </div>
           </div>
-        </div>
 
-        <div className="grid gap-8 p-10 pt-0 lg:p-12 lg:pt-0 lg:grid-cols-[0.8fr_1.2fr]">
-          <div className="overflow-hidden rounded-xl border border-rbx-border bg-rbx-surface-3">
+          {/* Right: Thumbnail */}
+          <div className="relative overflow-hidden rounded-xl border border-rbx-border bg-rbx-surface-3 aspect-video lg:aspect-auto lg:min-h-80">
             {metadata?.thumbnail_url ? (
               <img
                 src={metadata.thumbnail_url}
@@ -75,29 +107,24 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="flex h-60 items-center justify-center text-sm font-bold text-rbx-muted">Roblox thumbnail unavailable</div>
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-rbx-surface-2 to-rbx-surface-3 text-sm font-black text-rbx-muted">No thumbnail</div>
             )}
-          </div>
-          <div className="space-y-6">
-            <div className="flex flex-wrap gap-3">
-              <span className="rounded-xl border border-rbx-border bg-rbx-surface-2 px-4 py-2.5 text-xs font-bold text-white">👥 {formatStat(metadata?.player_count)} playing</span>
-              <span className="rounded-xl border border-rbx-border bg-rbx-surface-2 px-4 py-2.5 text-xs font-bold text-white">🎮 {formatStat(metadata?.visits)} visits</span>
-              <span className="rounded-xl border border-rbx-border bg-rbx-surface-2 px-4 py-2.5 text-xs font-semibold text-rbx-muted">Submitted {dateFormatter.format(new Date(game.created_at))}</span>
-            </div>
-            <div className="relative overflow-hidden rounded-xl border border-rbx-border bg-rbx-surface-2 p-6">
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-rbx-purple/10 via-transparent to-transparent" />
-              <h2 className="relative text-base font-black text-white">Why this game stands out</h2>
-              <p className="relative mt-3 text-sm leading-relaxed text-rbx-muted">This page surfaces Roblox-native details such as the thumbnail, live player count, and visit count whenever the game URL can be resolved automatically.</p>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Reviews Section */}
-      <ReviewsSection gameId={id} robloxUrl={game.roblox_url} />
+      {/* Reviews and Comments Section - Two Column on Desktop */}
+      <div className="grid gap-12 lg:grid-cols-[1fr_1fr]">
+        {/* Left: Reviews */}
+        <div>
+          <ReviewsSection gameId={id} robloxUrl={game.roblox_url} />
+        </div>
 
-      {/* Comments Section */}
-      <CommentsSection gameId={id} />
+        {/* Right: Comments */}
+        <div>
+          <CommentsSection gameId={id} />
+        </div>
+      </div>
     </main>
   );
 }

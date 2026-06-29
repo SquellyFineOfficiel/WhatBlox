@@ -21,13 +21,14 @@ export default function Header() {
           />
           <div>
             <p className="text-base font-black tracking-tight bg-gradient-to-r from-rbx-red to-rbx-orange bg-clip-text text-transparent">WhatBlox</p>
-            <p className="text-[10px] text-rbx-muted leading-none">Discover indie Roblox games</p>
+            <p className="text-[10px] text-rbx-muted leading-none">Discover small developers Roblox games</p>
           </div>
         </Link>
         <SearchBar />
         <div className="flex items-center gap-6 text-sm font-semibold text-rbx-muted">
           <Link href="/" className="rounded-md transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">Trending</Link>
-          <Link href="/wishlist" className="rounded-md transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">Wishlist</Link>
+          <Link href="/discovery" className="rounded-md transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">Discovery</Link>
+          <Link href="/playlist" className="rounded-md transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">Playlist</Link>
           <Link href="/submit" className="rounded-md transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">Submit</Link>
           <NotificationsBell />
           <UserHeader />

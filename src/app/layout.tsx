@@ -6,7 +6,7 @@ import Header from '@/src/components/header';
 
 export const metadata: Metadata = {
   title: 'WhatBlox',
-  description: 'Discover and vote on Roblox games from indie creators.',
+  description: 'Discover and vote on Roblox games from small developers.',
   icons: {
     icon: '/branding/favicon.png',
     shortcut: '/branding/favicon.png',

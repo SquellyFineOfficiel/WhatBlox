@@ -128,17 +128,17 @@ export default function AddToWishlistButton({ gameId }: { gameId: string }) {
           setSuccess('');
           setShowModal(true);
         }}
-        className="rounded-lg border border-rbx-border px-5 py-2 text-xs font-semibold text-rbx-muted transition hover:text-white hover:border-white/20 focus-visible:ring-2 focus-visible:ring-rbx-orange"
+        className="rounded-lg border border-rbx-border bg-rbx-surface-2 px-6 py-3 text-sm font-bold text-rbx-muted transition hover:text-white hover:border-rbx-orange/50 active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange"
       >
-        ❤️ Save
+        ❤️ Add to Playlist
       </button>
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="rounded-xl border border-rbx-border bg-rbx-surface max-w-md w-full p-6 space-y-4">
             <div>
-              <h2 className="text-xl font-bold text-white">Save to Wishlist</h2>
-              <p className="mt-1 text-sm text-rbx-muted">Add this game to one of your wishlists</p>
+              <h2 className="text-xl font-bold text-white">Add to Playlist</h2>
+              <p className="mt-1 text-sm text-rbx-muted">Add this game to one of your playlists</p>
             </div>
 
             {error && (
@@ -153,9 +153,9 @@ export default function AddToWishlistButton({ gameId }: { gameId: string }) {
               </div>
             )}
 
-            {/* Create new wishlist */}
+            {/* Create new playlist */}
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-white">Create New Wishlist</label>
+              <label className="block text-sm font-semibold text-white">Create New Playlist</label>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -175,11 +175,11 @@ export default function AddToWishlistButton({ gameId }: { gameId: string }) {
               </div>
             </div>
 
-            {/* Existing wishlists */}
+            {/* Existing playlists */}
             <div className="space-y-2 max-h-64 overflow-y-auto">
               <label className="block text-sm font-semibold text-white">Add to Existing</label>
               {loading ? (
-                <p className="text-sm text-rbx-muted">Loading wishlists...</p>
+                <p className="text-sm text-rbx-muted">Loading playlists...</p>
               ) : wishlists.length > 0 ? (
                 <div className="space-y-2">
                   {wishlists.map((wishlist) => (
@@ -197,7 +197,7 @@ export default function AddToWishlistButton({ gameId }: { gameId: string }) {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-rbx-muted">Create a wishlist first</p>
+                <p className="text-sm text-rbx-muted">Create a playlist first</p>
               )}
             </div>
 

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/src/lib/supabase/client';
 
@@ -224,272 +225,279 @@ export default function ReviewsSection({ gameId, robloxUrl }: { gameId: string; 
   };
 
   return (
-    <div className="mt-12 space-y-8">
-      <div className="border-t border-rbx-border pt-8">
-        <h2 className="text-2xl font-black text-white">Reviews & Ratings</h2>
+    <div className="space-y-6">
+      <div className="border-b border-rbx-border pb-6">
+        <h2 className="text-xl font-black text-white">Reviews & Ratings</h2>
+        <p className="mt-1 text-sm text-rbx-muted">See what other players think about this game</p>
+      </div>
 
-        {/* Rating Stats */}
-        {reviewsData && (
-          <div className="mt-6 grid gap-6 sm:grid-cols-2">
-            <div className="rounded-xl border border-rbx-border bg-rbx-surface-2 p-6">
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-black text-white">
-                  {reviewsData.stats.averageRating.toFixed(1)}
+      {/* Rating Stats */}
+      {reviewsData && (
+        <div className="space-y-4">
+          <div className="rounded-xl border border-rbx-border bg-rbx-surface-2 p-6">
+            <div className="flex items-baseline gap-2 mb-3">
+              <span className="text-3xl font-black text-white">
+                {reviewsData.stats.averageRating.toFixed(1)}
+              </span>
+              <span className="text-sm text-rbx-muted">/ 5.0</span>
+            </div>
+            <div className="flex gap-1 mb-3">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <span
+                  key={i}
+                  className={i <= Math.round(reviewsData.stats.averageRating) ? 'text-rbx-orange text-lg' : 'text-rbx-muted/30 text-lg'}
+                >
+                  ★
                 </span>
-                <span className="text-sm text-rbx-muted">out of 5</span>
-              </div>
-              <div className="mt-2 flex gap-1">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <span
-                    key={i}
-                    className={i <= Math.round(reviewsData.stats.averageRating) ? 'text-rbx-orange' : 'text-rbx-muted'}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
-              <p className="mt-3 text-sm text-rbx-muted">
-                Based on {reviewsData.stats.totalReviews} review{reviewsData.stats.totalReviews !== 1 ? 's' : ''}
+              ))}
+            </div>
+            <p className="text-xs text-rbx-muted">
+              {reviewsData.stats.totalReviews} review{reviewsData.stats.totalReviews !== 1 ? 's' : ''}
+            </p>
+          </div>
+
+          {/* Rating Distribution */}
+          <div className="rounded-xl border border-rbx-border bg-rbx-surface-2 p-6 space-y-3">
+            {[5, 4, 3, 2, 1].map((rating) => {
+              const count = reviewsData.stats.ratingDistribution[rating] || 0;
+              const percentage = reviewsData.stats.totalReviews > 0 
+                ? (count / reviewsData.stats.totalReviews) * 100 
+                : 0;
+              return (
+                <div key={rating} className="flex items-center gap-3 text-xs">
+                  <span className="w-6 font-semibold text-rbx-muted">{rating}★</span>
+                  <div className="flex-1 h-2 bg-rbx-surface rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-rbx-orange to-rbx-red transition-all"
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                  <span className="w-10 text-right text-rbx-muted">{count}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Review Form */}
+      {!userReview && (
+        <div>
+          {!currentUser ? (
+            <div className="rounded-lg border border-rbx-border bg-rbx-surface-2 p-6 text-center">
+              <p className="text-sm text-rbx-muted mb-4">Sign in to leave a review</p>
+              <Link href="/auth" className="inline-block rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-2 text-sm font-bold text-white transition hover:opacity-90">
+                Sign In →
+              </Link>
+            </div>
+          ) : !hasPlayedGame && !checkingPlayStatus ? (
+            <div className="rounded-lg border border-orange-500/20 bg-orange-500/10 p-4">
+              <p className="text-xs text-orange-400">
+                ⚠️ Play this game first to leave a review
               </p>
             </div>
-
-            {/* Rating Distribution */}
-            <div className="rounded-xl border border-rbx-border bg-rbx-surface-2 p-6 space-y-2">
-              {[5, 4, 3, 2, 1].map((rating) => {
-                const count = reviewsData.stats.ratingDistribution[rating] || 0;
-                const percentage = reviewsData.stats.totalReviews > 0 
-                  ? (count / reviewsData.stats.totalReviews) * 100 
-                  : 0;
-                return (
-                  <div key={rating} className="flex items-center gap-2">
-                    <span className="w-8 text-sm font-semibold text-rbx-muted">{rating}★</span>
-                    <div className="flex-1 h-2 bg-rbx-surface rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-rbx-orange to-rbx-red"
-                        style={{ width: `${percentage}%` }}
-                      />
-                    </div>
-                    <span className="w-12 text-right text-xs text-rbx-muted">{count}</span>
-                  </div>
-                );
-              })}
+          ) : checkingPlayStatus ? (
+            <div className="rounded-lg bg-rbx-surface-2 px-4 py-3 text-xs text-rbx-muted">
+              Checking if you've played...
             </div>
-          </div>
-        )}
-
-        {/* Review Form */}
-        {!userReview && currentUser && (
-          <div className="mt-8">
-            {!hasPlayedGame && !checkingPlayStatus ? (
-              <div className="rounded-xl border border-orange-500/20 bg-orange-500/10 p-6">
-                <p className="text-sm text-orange-400">
-                  ⚠️ You must play this game before you can leave a review. Join the game on Roblox and come back to share your thoughts!
-                </p>
-              </div>
-            ) : checkingPlayStatus ? (
-              <div className="rounded-lg bg-rbx-surface-2 px-6 py-3 text-sm text-rbx-muted">
-                Checking if you've played this game...
-              </div>
-            ) : (
-              <>
-                {!showForm ? (
-                  <button
-                    onClick={() => setShowForm(true)}
-                    className="rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-3 text-sm font-bold text-white transition hover:opacity-90"
-                  >
-                    ✍️ Write a Review
-                  </button>
-                ) : (
-                  <form onSubmit={handleSubmitReview} className="rounded-xl border border-rbx-border bg-rbx-surface-2 p-6 space-y-4">
-                    {error && (
-                      <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-                        {error}
-                      </div>
-                    )}
-                    {success && (
-                      <div className="rounded-lg border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-400">
-                        {success}
-                      </div>
-                    )}
-
-                    <div>
-                      <label className="block text-sm font-semibold text-white mb-2">Rating</label>
-                      <div className="flex gap-2">
-                        {[1, 2, 3, 4, 5].map((rating) => (
-                          <button
-                            key={rating}
-                            type="button"
-                            onClick={() => setFormData({ ...formData, rating })}
-                            className={`text-3xl transition ${
-                              rating <= formData.rating ? 'text-rbx-orange' : 'text-rbx-muted hover:text-white'
-                            }`}
-                          >
-                            ★
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-white mb-2">Title</label>
-                      <input
-                        type="text"
-                        value={formData.title}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        placeholder="Summarize your experience..."
-                        className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-4 py-2 text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none"
-                        maxLength={200}
-                      />
-                      <p className="mt-1 text-xs text-rbx-muted">{formData.title.length}/200</p>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-white mb-2">Review</label>
-                      <textarea
-                        value={formData.content}
-                        onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                        placeholder="Share your thoughts about this game..."
-                        className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-4 py-2 text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none"
-                        rows={5}
-                        maxLength={5000}
-                      />
-                      <p className="mt-1 text-xs text-rbx-muted">{formData.content.length}/5000</p>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <button
-                        type="submit"
-                        disabled={submitting}
-                        className="rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-2 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
-                      >
-                        {submitting ? 'Submitting...' : 'Submit Review'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowForm(false);
-                          setError('');
-                          setSuccess('');
-                        }}
-                        className="rounded-lg border border-rbx-border px-6 py-2 text-sm font-bold text-rbx-muted transition hover:text-white"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                )}
-              </>
-            )}
-          </div>
-        )}
-
-        {/* Reviews List */}
-        <div className="mt-8">
-          {reviewsData && reviewsData.reviews.length > 0 ? (
+          ) : (
             <>
-              <div className="mb-6 flex items-center gap-3">
-                <label className="text-sm font-semibold text-rbx-muted">Sort by:</label>
-                <select
-                  value={sort}
-                  onChange={(e) => {
-                    setSort(e.target.value);
-                    setPage(1);
-                  }}
-                  className="rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white focus:border-rbx-orange focus:outline-none"
+              {!showForm ? (
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="w-full rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-3 text-sm font-bold text-white transition hover:opacity-90"
                 >
-                  <option value="recent">Recent</option>
-                  <option value="helpful">Most Helpful</option>
-                  <option value="rating_high">Highest Rated</option>
-                  <option value="rating_low">Lowest Rated</option>
-                </select>
-              </div>
-
-              <div className="space-y-4">
-                {reviewsData.reviews.map((review) => (
-                  <div key={review.id} className="rounded-lg border border-rbx-border bg-rbx-surface p-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <div className="flex gap-1">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                              <span
-                                key={i}
-                                className={i <= review.rating ? 'text-rbx-orange' : 'text-rbx-muted'}
-                              >
-                                ★
-                              </span>
-                            ))}
-                          </div>
-                          <h3 className="font-bold text-white">{review.title}</h3>
-                        </div>
-                        <p className="mt-1 text-xs text-rbx-muted">
-                          By {review.reviewer?.display_name || 'Anonymous'} • {dateFormatter.format(new Date(review.created_at))}
-                        </p>
-                        <p className="mt-3 text-sm leading-relaxed text-rbx-muted">{review.content}</p>
-                      </div>
+                  ✍️ Write Review
+                </button>
+              ) : (
+                <form onSubmit={handleSubmitReview} className="rounded-xl border border-rbx-border bg-rbx-surface-2 p-5 space-y-4">
+                  {error && (
+                    <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-400">
+                      {error}
                     </div>
+                  )}
+                  {success && (
+                    <div className="rounded-lg border border-green-500/20 bg-green-500/10 px-3 py-2 text-xs text-green-400">
+                      {success}
+                    </div>
+                  )}
 
-                    <div className="mt-4 flex items-center gap-4 pt-4 border-t border-rbx-border/30">
-                      <button
-                        onClick={() => handleHelpfulVote(review.id, true)}
-                        className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-rbx-muted transition hover:text-white hover:bg-rbx-surface-2"
-                      >
-                        👍 {review.helpful_count}
-                      </button>
-                      <button
-                        onClick={() => handleHelpfulVote(review.id, false)}
-                        className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-rbx-muted transition hover:text-white hover:bg-rbx-surface-2"
-                      >
-                        👎 {review.unhelpful_count}
-                      </button>
+                  <div>
+                    <label className="block text-xs font-semibold text-white mb-2">Rating</label>
+                    <div className="flex gap-2">
+                      {[1, 2, 3, 4, 5].map((rating) => (
+                        <button
+                          key={rating}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, rating })}
+                          className={`text-2xl transition ${
+                            rating <= formData.rating ? 'text-rbx-orange' : 'text-rbx-muted hover:text-white'
+                          }`}
+                        >
+                          ★
+                        </button>
+                      ))}
                     </div>
                   </div>
-                ))}
-              </div>
 
-              {/* Pagination */}
-              {reviewsData.pagination.totalPages > 1 && (
-                <div className="mt-6 flex items-center justify-center gap-2">
-                  {page > 1 && (
-                    <button
-                      onClick={() => setPage(page - 1)}
-                      className="rounded-lg border border-rbx-border px-3 py-2 text-sm font-semibold text-rbx-muted transition hover:text-white"
-                    >
-                      ← Previous
-                    </button>
-                  )}
-                  <div className="flex gap-1">
-                    {Array.from({ length: reviewsData.pagination.totalPages }, (_, i) => i + 1).map((p) => (
-                      <button
-                        key={p}
-                        onClick={() => setPage(p)}
-                        className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
-                          p === page
-                            ? 'bg-gradient-to-r from-rbx-red to-rbx-orange text-white'
-                            : 'border border-rbx-border text-rbx-muted hover:text-white'
-                        }`}
-                      >
-                        {p}
-                      </button>
-                    ))}
+                  <div>
+                    <label className="block text-xs font-semibold text-white mb-2">Title</label>
+                    <input
+                      type="text"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      placeholder="Summarize your experience..."
+                      className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none"
+                      maxLength={200}
+                    />
+                    <p className="mt-1 text-xs text-rbx-muted text-right">{formData.title.length}/200</p>
                   </div>
-                  {page < reviewsData.pagination.totalPages && (
+
+                  <div>
+                    <label className="block text-xs font-semibold text-white mb-2">Review</label>
+                    <textarea
+                      value={formData.content}
+                      onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                      placeholder="Share your thoughts..."
+                      className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none resize-none"
+                      rows={4}
+                      maxLength={5000}
+                    />
+                    <p className="mt-1 text-xs text-rbx-muted text-right">{formData.content.length}/5000</p>
+                  </div>
+
+                  <div className="flex gap-2">
                     <button
-                      onClick={() => setPage(page + 1)}
-                      className="rounded-lg border border-rbx-border px-3 py-2 text-sm font-semibold text-rbx-muted transition hover:text-white"
+                      type="submit"
+                      disabled={submitting}
+                      className="flex-1 rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-2 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
                     >
-                      Next →
+                      {submitting ? 'Submitting...' : 'Submit'}
                     </button>
-                  )}
-                </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowForm(false);
+                        setError('');
+                        setSuccess('');
+                      }}
+                      className="flex-1 rounded-lg border border-rbx-border px-4 py-2 text-sm font-bold text-rbx-muted transition hover:text-white"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
               )}
             </>
-          ) : (
-            <div className="rounded-lg border border-rbx-border bg-rbx-surface p-8 text-center">
-              <p className="text-sm text-rbx-muted">No reviews yet. Be the first to review this game!</p>
-            </div>
           )}
         </div>
+      )}
+
+      {/* Reviews List */}
+      <div>
+        {reviewsData && reviewsData.reviews.length > 0 ? (
+          <>
+            <div className="mb-4 flex items-center gap-2">
+              <label className="text-xs font-semibold text-rbx-muted">Sort:</label>
+              <select
+                value={sort}
+                onChange={(e) => {
+                  setSort(e.target.value);
+                  setPage(1);
+                }}
+                className="rounded-lg border border-rbx-border bg-rbx-surface px-3 py-1.5 text-xs text-white focus:border-rbx-orange focus:outline-none"
+              >
+                <option value="recent">Recent</option>
+                <option value="helpful">Most Helpful</option>
+                <option value="rating_high">Highest Rated</option>
+                <option value="rating_low">Lowest Rated</option>
+              </select>
+            </div>
+
+            <div className="space-y-3">
+              {reviewsData.reviews.map((review) => (
+                <div key={review.id} className="rounded-lg border border-rbx-border bg-rbx-surface-2 p-4">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-0.5">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <span
+                            key={i}
+                            className={`text-sm ${i <= review.rating ? 'text-rbx-orange' : 'text-rbx-muted/30'}`}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                      <h3 className="font-semibold text-white text-sm">{review.title}</h3>
+                    </div>
+                    <span className="text-xs text-rbx-muted shrink-0">{dateFormatter.format(new Date(review.created_at))}</span>
+                  </div>
+                  <p className="text-xs text-rbx-muted mb-1">
+                    By {review.reviewer?.display_name || 'Anonymous'}
+                  </p>
+                  <p className="text-sm text-rbx-muted leading-relaxed mb-3">{review.content}</p>
+
+                  <div className="flex items-center gap-2 pt-3 border-t border-rbx-border/30">
+                    <button
+                      onClick={() => handleHelpfulVote(review.id, true)}
+                      className="flex items-center gap-1 rounded px-2 py-1 text-xs font-semibold text-rbx-muted transition hover:text-white hover:bg-rbx-surface"
+                    >
+                      👍 {review.helpful_count}
+                    </button>
+                    <button
+                      onClick={() => handleHelpfulVote(review.id, false)}
+                      className="flex items-center gap-1 rounded px-2 py-1 text-xs font-semibold text-rbx-muted transition hover:text-white hover:bg-rbx-surface"
+                    >
+                      👎 {review.unhelpful_count}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {reviewsData.pagination.totalPages > 1 && (
+              <div className="mt-4 flex items-center justify-center gap-2">
+                {page > 1 && (
+                  <button
+                    onClick={() => setPage(page - 1)}
+                    className="rounded border border-rbx-border px-2 py-1 text-xs font-semibold text-rbx-muted transition hover:text-white"
+                  >
+                    ← Prev
+                  </button>
+                )}
+                <div className="flex gap-1">
+                  {Array.from({ length: Math.min(reviewsData.pagination.totalPages, 5) }, (_, i) => i + 1).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setPage(p)}
+                      className={`rounded px-2 py-1 text-xs font-semibold transition ${
+                        p === page
+                          ? 'bg-gradient-to-r from-rbx-red to-rbx-orange text-white'
+                          : 'border border-rbx-border text-rbx-muted hover:text-white'
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+                {page < reviewsData.pagination.totalPages && (
+                  <button
+                    onClick={() => setPage(page + 1)}
+                    className="rounded border border-rbx-border px-2 py-1 text-xs font-semibold text-rbx-muted transition hover:text-white"
+                  >
+                    Next →
+                  </button>
+                )}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="rounded-lg border border-rbx-border bg-rbx-surface-2 p-6 text-center">
+            <p className="text-sm text-rbx-muted">No reviews yet. Be the first!</p>
+          </div>
+        )}
       </div>
     </div>
   );

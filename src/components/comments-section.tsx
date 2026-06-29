@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/src/lib/supabase/client';
 
@@ -186,173 +187,181 @@ export default function CommentsSection({ gameId }: { gameId: string }) {
   };
 
   return (
-    <div className="mt-12 space-y-8">
-      <div className="border-t border-rbx-border pt-8">
-        <h2 className="text-2xl font-black text-white">Discussion ({commentsData?.pagination.totalResults || 0})</h2>
+    <div className="space-y-6">
+      <div className="border-b border-rbx-border pb-6">
+        <h2 className="text-xl font-black text-white">Discussion</h2>
+        <p className="mt-1 text-sm text-rbx-muted">{commentsData?.pagination.totalResults || 0} message{(commentsData?.pagination.totalResults || 0) !== 1 ? 's' : ''}</p>
+      </div>
 
-        {/* New Comment Form */}
-        {currentUser && (
-          <div className="mt-8">
-            {!showForm ? (
-              <button
-                onClick={() => setShowForm(true)}
-                className="rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-3 text-sm font-bold text-white transition hover:opacity-90"
-              >
-                💬 Join the Discussion
-              </button>
-            ) : (
-              <form onSubmit={handleSubmitComment} className="rounded-xl border border-rbx-border bg-rbx-surface-2 p-6 space-y-4">
-                {error && (
-                  <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-                    {error}
-                  </div>
-                )}
-
-                <div>
-                  <textarea
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Share your thoughts about this game..."
-                    className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-4 py-2 text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none"
-                    rows={4}
-                    maxLength={5000}
-                  />
-                  <p className="mt-1 text-xs text-rbx-muted">{newComment.length}/5000</p>
-                </div>
-
-                <div className="flex gap-3">
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-2 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
-                  >
-                    {submitting ? 'Posting...' : 'Post Comment'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowForm(false);
-                      setError('');
-                    }}
-                    className="rounded-lg border border-rbx-border px-6 py-2 text-sm font-bold text-rbx-muted transition hover:text-white"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        )}
-
-        {/* Comments List */}
-        <div className="mt-8">
-          {loading ? (
-            <div className="rounded-lg bg-rbx-surface-2 px-6 py-8 text-center">
-              <p className="text-sm text-rbx-muted">Loading comments...</p>
-            </div>
-          ) : commentsData && commentsData.comments.length > 0 ? (
-            <>
-              <div className="mb-6 flex items-center gap-3">
-                <label className="text-sm font-semibold text-rbx-muted">Sort by:</label>
-                <select
-                  value={sort}
-                  onChange={(e) => {
-                    setSort(e.target.value);
-                    setPage(1);
-                  }}
-                  className="rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white focus:border-rbx-orange focus:outline-none"
-                >
-                  <option value="recent">Recent</option>
-                  <option value="trending">Most Liked</option>
-                </select>
-              </div>
-
-              <div className="space-y-4">
-                {commentsData.comments.map((comment) => {
-                  const isLiked = likedCommentIds.has(comment.id);
-                  return (
-                    <div key={comment.id} className="rounded-lg border border-rbx-border bg-rbx-surface p-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-white">{comment.profiles?.display_name || 'Anonymous'}</span>
-                            <span className="text-xs text-rbx-muted">
-                              {dateFormatter.format(new Date(comment.created_at))}
-                              {comment.is_edited && ' (edited)'}
-                            </span>
-                          </div>
-                          <p className="mt-2 text-sm leading-relaxed text-rbx-muted">{comment.content}</p>
-                        </div>
-                      </div>
-
-                      <div className="mt-4 flex items-center gap-4 pt-4 border-t border-rbx-border/30">
-                        <button
-                          onClick={() => handleLikeComment(comment.id, isLiked)}
-                          className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition ${
-                            isLiked
-                              ? 'text-rbx-orange bg-rbx-surface-2'
-                              : 'text-rbx-muted hover:text-white hover:bg-rbx-surface-2'
-                          }`}
-                        >
-                          👍 {comment.likes_count}
-                        </button>
-                        {comment.reply_count > 0 && (
-                          <button
-                            onClick={() => toggleReplies(comment.id)}
-                            className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-rbx-muted transition hover:text-white hover:bg-rbx-surface-2"
-                          >
-                            💬 {comment.reply_count} {expandedReplies.has(comment.id) ? '▼' : '▶'}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Pagination */}
-              {commentsData.pagination.totalPages > 1 && (
-                <div className="mt-6 flex items-center justify-center gap-2">
-                  {page > 1 && (
-                    <button
-                      onClick={() => setPage(page - 1)}
-                      className="rounded-lg border border-rbx-border px-3 py-2 text-sm font-semibold text-rbx-muted transition hover:text-white"
-                    >
-                      ← Previous
-                    </button>
-                  )}
-                  <div className="flex gap-1">
-                    {Array.from({ length: commentsData.pagination.totalPages }, (_, i) => i + 1).map((p) => (
-                      <button
-                        key={p}
-                        onClick={() => setPage(p)}
-                        className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
-                          p === page
-                            ? 'bg-gradient-to-r from-rbx-red to-rbx-orange text-white'
-                            : 'border border-rbx-border text-rbx-muted hover:text-white'
-                        }`}
-                      >
-                        {p}
-                      </button>
-                    ))}
-                  </div>
-                  {page < commentsData.pagination.totalPages && (
-                    <button
-                      onClick={() => setPage(page + 1)}
-                      className="rounded-lg border border-rbx-border px-3 py-2 text-sm font-semibold text-rbx-muted transition hover:text-white"
-                    >
-                      Next →
-                    </button>
-                  )}
+      {/* New Comment Form */}
+      {currentUser ? (
+        <div>
+          {!showForm ? (
+            <button
+              onClick={() => setShowForm(true)}
+              className="w-full rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-3 text-sm font-bold text-white transition hover:opacity-90"
+            >
+              💬 Start a conversation
+            </button>
+          ) : (
+            <form onSubmit={handleSubmitComment} className="rounded-xl border border-rbx-border bg-rbx-surface-2 p-5 space-y-4">
+              {error && (
+                <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-400">
+                  {error}
                 </div>
               )}
-            </>
-          ) : (
-            <div className="rounded-lg border border-rbx-border bg-rbx-surface p-8 text-center">
-              <p className="text-sm text-rbx-muted">No comments yet. Be the first to join the discussion!</p>
-            </div>
+
+              <div>
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Share your thoughts..."
+                  className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none resize-none"
+                  rows={4}
+                  maxLength={5000}
+                />
+                <p className="mt-1 text-xs text-rbx-muted text-right">{newComment.length}/5000</p>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-2 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
+                >
+                  {submitting ? 'Posting...' : 'Post'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowForm(false);
+                    setError('');
+                  }}
+                  className="flex-1 rounded-lg border border-rbx-border px-4 py-2 text-sm font-bold text-rbx-muted transition hover:text-white"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           )}
         </div>
+      ) : (
+        <div className="rounded-lg border border-rbx-border bg-rbx-surface-2 p-6 text-center">
+          <p className="text-sm text-rbx-muted mb-4">Sign in to join the discussion</p>
+          <Link href="/auth" className="inline-block rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-2 text-sm font-bold text-white transition hover:opacity-90">
+            Sign In →
+          </Link>
+        </div>
+      )}
+
+      {/* Comments List */}
+      <div>
+        {loading ? (
+          <div className="rounded-lg bg-rbx-surface-2 px-6 py-8 text-center">
+            <p className="text-xs text-rbx-muted">Loading...</p>
+          </div>
+        ) : commentsData && commentsData.comments.length > 0 ? (
+          <>
+            <div className="mb-4 flex items-center gap-2">
+              <label className="text-xs font-semibold text-rbx-muted">Sort:</label>
+              <select
+                value={sort}
+                onChange={(e) => {
+                  setSort(e.target.value);
+                  setPage(1);
+                }}
+                className="rounded-lg border border-rbx-border bg-rbx-surface px-3 py-1.5 text-xs text-white focus:border-rbx-orange focus:outline-none"
+              >
+                <option value="recent">Recent</option>
+                <option value="trending">Most Liked</option>
+              </select>
+            </div>
+
+            <div className="space-y-3">
+              {commentsData.comments.map((comment) => {
+                const isLiked = likedCommentIds.has(comment.id);
+                return (
+                  <div key={comment.id} className="rounded-lg border border-rbx-border bg-rbx-surface-2 p-4">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-white text-sm truncate">{comment.profiles?.display_name || 'Anonymous'}</span>
+                          <span className="text-xs text-rbx-muted shrink-0">
+                            {dateFormatter.format(new Date(comment.created_at))}
+                            {comment.is_edited && ' (edited)'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-sm text-rbx-muted leading-relaxed break-words">{comment.content}</p>
+
+                    <div className="mt-3 flex items-center gap-2 pt-3 border-t border-rbx-border/30">
+                      <button
+                        onClick={() => handleLikeComment(comment.id, isLiked)}
+                        className={`flex items-center gap-1 rounded px-2 py-1 text-xs font-semibold transition ${
+                          isLiked
+                            ? 'text-rbx-orange bg-rbx-surface/50'
+                            : 'text-rbx-muted hover:text-white hover:bg-rbx-surface/50'
+                        }`}
+                      >
+                        👍 {comment.likes_count}
+                      </button>
+                      {comment.reply_count > 0 && (
+                        <button
+                          onClick={() => toggleReplies(comment.id)}
+                          className="flex items-center gap-1 rounded px-2 py-1 text-xs font-semibold text-rbx-muted transition hover:text-white hover:bg-rbx-surface/50"
+                        >
+                          💬 {comment.reply_count} {expandedReplies.has(comment.id) ? '▼' : '▶'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Pagination */}
+            {commentsData.pagination.totalPages > 1 && (
+              <div className="mt-4 flex items-center justify-center gap-2">
+                {page > 1 && (
+                  <button
+                    onClick={() => setPage(page - 1)}
+                    className="rounded border border-rbx-border px-2 py-1 text-xs font-semibold text-rbx-muted transition hover:text-white"
+                  >
+                    ← Prev
+                  </button>
+                )}
+                <div className="flex gap-1">
+                  {Array.from({ length: Math.min(commentsData.pagination.totalPages, 5) }, (_, i) => i + 1).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setPage(p)}
+                      className={`rounded px-2 py-1 text-xs font-semibold transition ${
+                        p === page
+                          ? 'bg-gradient-to-r from-rbx-red to-rbx-orange text-white'
+                          : 'border border-rbx-border text-rbx-muted hover:text-white'
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+                {page < commentsData.pagination.totalPages && (
+                  <button
+                    onClick={() => setPage(page + 1)}
+                    className="rounded border border-rbx-border px-2 py-1 text-xs font-semibold text-rbx-muted transition hover:text-white"
+                  >
+                    Next →
+                  </button>
+                )}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="rounded-lg border border-rbx-border bg-rbx-surface-2 p-6 text-center">
+            <p className="text-sm text-rbx-muted">No comments yet. Be the first!</p>
+          </div>
+        )}
       </div>
     </div>
   );
