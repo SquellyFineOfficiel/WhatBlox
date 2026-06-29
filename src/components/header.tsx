@@ -26,6 +26,7 @@ export default function Header() {
         <SearchBar />
         <div className="flex items-center gap-6 text-sm font-semibold text-rbx-muted">
           <Link href="/" className="rounded-md transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">Trending</Link>
+          <Link href="/wishlist" className="rounded-md transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">Wishlist</Link>
           <Link href="/submit" className="rounded-md transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">Submit</Link>
           <UserHeader />
         </div>

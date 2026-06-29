@@ -177,7 +177,7 @@ export async function DELETE(request: NextRequest) {
       .eq('id', wishlistItemId)
       .single();
 
-    if (!item || item.wishlists.user_id !== user.user.id) {
+    if (!item || !item.wishlists || item.wishlists[0].user_id !== user.user.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
