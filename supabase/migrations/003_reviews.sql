@@ -4,7 +4,7 @@
 -- Create reviews table
 CREATE TABLE IF NOT EXISTS public.reviews (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  game_id TEXT NOT NULL REFERENCES public.games(id) ON DELETE CASCADE,
+  game_id UUID NOT NULL REFERENCES public.games(id) ON DELETE CASCADE,
   user_id TEXT NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   rating SMALLINT NOT NULL CHECK (rating >= 1 AND rating <= 5),
   title TEXT NOT NULL,

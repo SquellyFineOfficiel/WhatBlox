@@ -4,7 +4,6 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/src/lib/supabase/client';
-import { getClientUser } from '@/src/lib/auth-client';
 import { formatStat, getRobloxGameMetadata, type RobloxMetadata } from '@/src/lib/roblox';
 
 const isValidRobloxUrl = (value: string) => /^https?:\/\/([a-z0-9-]+\.)?roblox\.com\//i.test(value);
@@ -17,11 +16,19 @@ export default function SubmitPage() {
   const [message, setMessage] = useState('');
   const [metadata, setMetadata] = useState<RobloxMetadata | null>(null);
   const [isDuplicate, setIsDuplicate] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [notSignedIn, setNotSignedIn] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    const user = getClientUser();
-    setIsAuthenticated(!!user);
+    const checkAuth = async () => {
+      const supabase = createClient();
+      if (supabase) {
+        const { data: { user } } = await supabase.auth.getUser();
+        setNotSignedIn(!user);
+      }
+      setCheckingAuth(false);
+    };
+    checkAuth();
   }, []);
 
   useEffect(() => {
@@ -34,7 +41,6 @@ export default function SubmitPage() {
         return;
       }
 
-      // Check if game already exists
       const supabase = createClient();
       if (supabase) {
         const { data: existingGame } = await supabase
@@ -48,7 +54,6 @@ export default function SubmitPage() {
         }
       }
 
-      // Load Roblox metadata
       const info = await getRobloxGameMetadata(robloxUrl);
       if (!ignore) {
         setMetadata(info);
@@ -117,9 +122,19 @@ export default function SubmitPage() {
     setLoading(false);
   };
 
-  return (
-    <main className="mx-auto flex max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
-      {isAuthenticated === false ? (
+  if (checkingAuth) {
+    return (
+      <main className="mx-auto flex max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+        <div className="w-full rounded-3xl border border-rbx-border bg-rbx-surface p-10 md:p-12">
+          <p className="text-center text-rbx-muted">Checking authentication...</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (notSignedIn) {
+    return (
+      <main className="mx-auto flex max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="w-full rounded-3xl border border-rbx-border bg-rbx-surface p-10 md:p-12">
           <h1 className="text-2xl font-black text-white">Sign in required</h1>
           <p className="mt-3 text-base text-rbx-muted leading-relaxed">You need to connect your Roblox account to submit games to WhatBlox.</p>
@@ -127,7 +142,12 @@ export default function SubmitPage() {
             Sign in with Roblox
           </Link>
         </div>
-      ) : (
+      </main>
+    );
+  }
+
+  return (
+    <main className="mx-auto flex max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="w-full rounded-3xl border border-rbx-border bg-rbx-surface p-10 md:p-12">
           <div className="mb-12 max-w-3xl">
             <span className="inline-block rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-1.5 text-[11px] font-black uppercase tracking-widest text-white">
@@ -231,9 +251,8 @@ export default function SubmitPage() {
                 {message}
               </p>
             ) : null}
-          </div>
         </div>
-      )}
+      </div>
     </main>
   );
 }
