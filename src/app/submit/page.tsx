@@ -75,9 +75,23 @@ export default function SubmitPage() {
       return;
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setMessage('You must be signed in with Roblox to submit a game.');
+    let userId: string | null = null;
+    try {
+      const response = await fetch('/api/auth/user');
+      if (!response.ok) {
+        setMessage('You must be signed in with Roblox to submit a game.');
+        setLoading(false);
+        return;
+      }
+      const userData = await response.json();
+      if (!userData.user?.id) {
+        setMessage('You must be signed in with Roblox to submit a game.');
+        setLoading(false);
+        return;
+      }
+      userId = userData.user.id;
+    } catch (error) {
+      setMessage('Failed to verify authentication. Please try again.');
       setLoading(false);
       return;
     }
@@ -92,7 +106,7 @@ export default function SubmitPage() {
       title: metadata.title,
       description: metadata.description,
       roblox_url: robloxUrl,
-      user_id: user.id,
+      user_id: userId,
       reviewer_message: reviewerMessage.trim() || null,
       status: 'review',
     });

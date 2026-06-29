@@ -1,4 +1,5 @@
 import { createClient } from '@/src/lib/supabase/server';
+import { getVerifiedServerUser } from '@/src/lib/auth-session';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET: Fetch wishlist items
@@ -73,19 +74,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const user = await getVerifiedServerUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const supabase = await createClient();
     if (!supabase) {
       return NextResponse.json(
         { error: 'Database not configured' },
         { status: 503 }
-      );
-    }
-
-    const { data: user } = await supabase.auth.getUser();
-    if (!user.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
       );
     }
 
@@ -96,7 +97,7 @@ export async function POST(request: NextRequest) {
       .eq('id', wishlistId)
       .single();
 
-    if (!wishlist || wishlist.user_id !== user.user.id) {
+    if (!wishlist || wishlist.user_id !== user.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -149,19 +150,19 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    const user = await getVerifiedServerUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const supabase = await createClient();
     if (!supabase) {
       return NextResponse.json(
         { error: 'Database not configured' },
         { status: 503 }
-      );
-    }
-
-    const { data: user } = await supabase.auth.getUser();
-    if (!user.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
       );
     }
 
@@ -177,7 +178,7 @@ export async function DELETE(request: NextRequest) {
       .eq('id', wishlistItemId)
       .single();
 
-    if (!item || !item.wishlists || item.wishlists[0].user_id !== user.user.id) {
+    if (!item || !item.wishlists || item.wishlists[0].user_id !== user.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }

@@ -1,10 +1,19 @@
 import { createClient } from '@/src/lib/supabase/server';
+import { getVerifiedServerUser } from '@/src/lib/auth-session';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET: Fetch user's wishlists
 // POST: Create a new wishlist
 export async function GET(request: NextRequest) {
   try {
+    const user = await getVerifiedServerUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const supabase = await createClient();
     if (!supabase) {
       return NextResponse.json(
@@ -13,18 +22,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { data: user } = await supabase.auth.getUser();
-    if (!user.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     const { data: wishlists, error } = await supabase
       .from('wishlists')
       .select('id,name,description,is_public,created_at,updated_at')
-      .eq('user_id', user.user.id)
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -57,6 +58,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const user = await getVerifiedServerUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const supabase = await createClient();
     if (!supabase) {
       return NextResponse.json(
@@ -65,18 +74,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: user } = await supabase.auth.getUser();
-    if (!user.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     const { data: wishlist, error } = await supabase
       .from('wishlists')
       .insert({
-        user_id: user.user.id,
+        user_id: user.id,
         name: name.trim().slice(0, 100),
         description: description ? description.trim().slice(0, 500) : null,
         is_public: isPublic || false,

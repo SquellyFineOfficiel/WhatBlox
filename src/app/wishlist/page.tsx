@@ -46,14 +46,22 @@ function WishlistContent() {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    const supabase = createClient();
-    if (!supabase) return;
-
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        setCurrentUser({ id: data.user.id });
+    const checkUser = async () => {
+      try {
+        const response = await fetch('/api/auth/user');
+        if (response.ok) {
+          const { user } = await response.json();
+          setCurrentUser({ id: user.id });
+        } else {
+          setCurrentUser(null);
+        }
+      } catch (err) {
+        console.error('Error checking user:', err);
+        setCurrentUser(null);
       }
-    });
+    };
+
+    checkUser();
   }, []);
 
   useEffect(() => {
