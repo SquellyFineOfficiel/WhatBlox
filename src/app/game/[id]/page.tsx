@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { createClient } from '@/src/lib/supabase/server';
 import { formatStat, getRobloxGameMetadata } from '@/src/lib/roblox';
 import ReviewsSection from '@/src/components/reviews-section';
+import CommentsSection from '@/src/components/comments-section';
 import AddToWishlistButton from '@/src/components/add-to-wishlist-button';
 
 const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
@@ -93,7 +94,10 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
       </div>
 
       {/* Reviews Section */}
-      <ReviewsSection gameId={id} />
+      <ReviewsSection gameId={id} robloxUrl={game.roblox_url} />
+
+      {/* Comments Section */}
+      <CommentsSection gameId={id} />
     </main>
   );
 }

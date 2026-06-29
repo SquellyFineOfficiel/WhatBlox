@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import UserHeader from '@/src/components/user-header';
 import SearchBar from '@/src/components/search-bar';
+import NotificationsBell from '@/src/components/notifications-bell';
 
 export default function Header() {
   return (
@@ -28,6 +29,7 @@ export default function Header() {
           <Link href="/" className="rounded-md transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">Trending</Link>
           <Link href="/wishlist" className="rounded-md transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">Wishlist</Link>
           <Link href="/submit" className="rounded-md transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">Submit</Link>
+          <NotificationsBell />
           <UserHeader />
         </div>
       </div>

@@ -38,14 +38,16 @@ type ReviewsResponse = {
 
 const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
 
-export default function ReviewsSection({ gameId }: { gameId: string }) {
+export default function ReviewsSection({ gameId, robloxUrl }: { gameId: string; robloxUrl: string }) {
   const [reviewsData, setReviewsData] = useState<ReviewsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [userReview, setUserReview] = useState<Review | null>(null);
-  const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ id: string; user_metadata?: { roblox_username?: string } } | null>(null);
   const [sort, setSort] = useState('recent');
   const [page, setPage] = useState(1);
+  const [hasPlayedGame, setHasPlayedGame] = useState(false);
+  const [checkingPlayStatus, setCheckingPlayStatus] = useState(true);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -63,10 +65,54 @@ export default function ReviewsSection({ gameId }: { gameId: string }) {
 
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) {
-        setCurrentUser({ id: data.user.id });
+        setCurrentUser({ 
+          id: data.user.id,
+          user_metadata: data.user.user_metadata as any
+        });
       }
     });
   }, []);
+
+  // Check if user has played the game
+  useEffect(() => {
+    const checkPlayStatus = async () => {
+      if (!currentUser?.user_metadata?.roblox_username) {
+        setCheckingPlayStatus(false);
+        return;
+      }
+
+      try {
+        setCheckingPlayStatus(true);
+        // Extract game ID from roblox_url (e.g., https://www.roblox.com/games/123456 -> 123456)
+        const gameIdMatch = robloxUrl.match(/\/games\/(\d+)/);
+        if (!gameIdMatch) {
+          setCheckingPlayStatus(false);
+          return;
+        }
+
+        const robloxGameId = gameIdMatch[1];
+        const username = currentUser.user_metadata.roblox_username;
+
+        // Call our API endpoint to check if user has played the game
+        const response = await fetch('/api/roblox/player-games', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, robloxGameId }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setHasPlayedGame(data.hasPlayed);
+        }
+      } catch (err) {
+        console.error('Error checking play status:', err);
+      } finally {
+        setCheckingPlayStatus(false);
+      }
+    };
+
+    checkPlayStatus();
+  }, [currentUser, robloxUrl]);
 
   useEffect(() => {
     const loadReviews = async () => {
@@ -234,91 +280,105 @@ export default function ReviewsSection({ gameId }: { gameId: string }) {
         {/* Review Form */}
         {!userReview && currentUser && (
           <div className="mt-8">
-            {!showForm ? (
-              <button
-                onClick={() => setShowForm(true)}
-                className="rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-3 text-sm font-bold text-white transition hover:opacity-90"
-              >
-                ✍️ Write a Review
-              </button>
+            {!hasPlayedGame && !checkingPlayStatus ? (
+              <div className="rounded-xl border border-orange-500/20 bg-orange-500/10 p-6">
+                <p className="text-sm text-orange-400">
+                  ⚠️ You must play this game before you can leave a review. Join the game on Roblox and come back to share your thoughts!
+                </p>
+              </div>
+            ) : checkingPlayStatus ? (
+              <div className="rounded-lg bg-rbx-surface-2 px-6 py-3 text-sm text-rbx-muted">
+                Checking if you've played this game...
+              </div>
             ) : (
-              <form onSubmit={handleSubmitReview} className="rounded-xl border border-rbx-border bg-rbx-surface-2 p-6 space-y-4">
-                {error && (
-                  <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-                    {error}
-                  </div>
-                )}
-                {success && (
-                  <div className="rounded-lg border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-400">
-                    {success}
-                  </div>
-                )}
+              <>
+                {!showForm ? (
+                  <button
+                    onClick={() => setShowForm(true)}
+                    className="rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-3 text-sm font-bold text-white transition hover:opacity-90"
+                  >
+                    ✍️ Write a Review
+                  </button>
+                ) : (
+                  <form onSubmit={handleSubmitReview} className="rounded-xl border border-rbx-border bg-rbx-surface-2 p-6 space-y-4">
+                    {error && (
+                      <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                        {error}
+                      </div>
+                    )}
+                    {success && (
+                      <div className="rounded-lg border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-400">
+                        {success}
+                      </div>
+                    )}
 
-                <div>
-                  <label className="block text-sm font-semibold text-white mb-2">Rating</label>
-                  <div className="flex gap-2">
-                    {[1, 2, 3, 4, 5].map((rating) => (
+                    <div>
+                      <label className="block text-sm font-semibold text-white mb-2">Rating</label>
+                      <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5].map((rating) => (
+                          <button
+                            key={rating}
+                            type="button"
+                            onClick={() => setFormData({ ...formData, rating })}
+                            className={`text-3xl transition ${
+                              rating <= formData.rating ? 'text-rbx-orange' : 'text-rbx-muted hover:text-white'
+                            }`}
+                          >
+                            ★
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-white mb-2">Title</label>
+                      <input
+                        type="text"
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        placeholder="Summarize your experience..."
+                        className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-4 py-2 text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none"
+                        maxLength={200}
+                      />
+                      <p className="mt-1 text-xs text-rbx-muted">{formData.title.length}/200</p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-white mb-2">Review</label>
+                      <textarea
+                        value={formData.content}
+                        onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                        placeholder="Share your thoughts about this game..."
+                        className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-4 py-2 text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none"
+                        rows={5}
+                        maxLength={5000}
+                      />
+                      <p className="mt-1 text-xs text-rbx-muted">{formData.content.length}/5000</p>
+                    </div>
+
+                    <div className="flex gap-3">
                       <button
-                        key={rating}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, rating })}
-                        className={`text-3xl transition ${
-                          rating <= formData.rating ? 'text-rbx-orange' : 'text-rbx-muted hover:text-white'
-                        }`}
+                        type="submit"
+                        disabled={submitting}
+                        className="rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-2 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
                       >
-                        ★
+                        {submitting ? 'Submitting...' : 'Submit Review'}
                       </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-white mb-2">Title</label>
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="Summarize your experience..."
-                    className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-4 py-2 text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none"
-                    maxLength={200}
-                  />
-                  <p className="mt-1 text-xs text-rbx-muted">{formData.title.length}/200</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-white mb-2">Review</label>
-                  <textarea
-                    value={formData.content}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    placeholder="Share your thoughts about this game..."
-                    className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-4 py-2 text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none"
-                    rows={5}
-                    maxLength={5000}
-                  />
-                  <p className="mt-1 text-xs text-rbx-muted">{formData.content.length}/5000</p>
-                </div>
-
-                <div className="flex gap-3">
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-2 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
-                  >
-                    {submitting ? 'Submitting...' : 'Submit Review'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowForm(false);
-                      setError('');
-                      setSuccess('');
-                    }}
-                    className="rounded-lg border border-rbx-border px-6 py-2 text-sm font-bold text-rbx-muted transition hover:text-white"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowForm(false);
+                          setError('');
+                          setSuccess('');
+                        }}
+                        className="rounded-lg border border-rbx-border px-6 py-2 text-sm font-bold text-rbx-muted transition hover:text-white"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </>
             )}
           </div>
         )}
