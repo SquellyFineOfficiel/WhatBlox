@@ -103,9 +103,22 @@ export default function BanGamesPage() {
       setRobloxUrl('');
       setBanReason('');
       setMessage('✓ Game banned successfully');
+      
+      // Add the newly banned game to the list
+      if (existingGame?.id) {
+        setGames([
+          {
+            id: existingGame.id,
+            title: '',
+            roblox_url: robloxUrl,
+            banned_at: new Date().toISOString(),
+            ban_reason: banReason,
+          },
+          ...games,
+        ]);
+      }
+      
       setTimeout(() => setMessage(''), 3000);
-      // Reload banned games
-      window.location.reload();
     }
   };
 

@@ -128,7 +128,7 @@ export default function LogsPage() {
                 const dateStr = new Date(log.created_at).toLocaleDateString('en', {
                   month: 'short',
                   day: 'numeric',
-                  hour: '2-digit',
+                   hour: 'numeric',
                   minute: '2-digit',
                 });
 

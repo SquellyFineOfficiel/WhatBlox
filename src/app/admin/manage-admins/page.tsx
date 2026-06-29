@@ -263,7 +263,7 @@ export default function ManageAdminsPage() {
               <button
                 type="submit"
                 disabled={addingAdmin}
-                className="w-full rounded-xl bg-gradient-to-r from-rbx-purple to-rbx-pink px-6 py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
+                className="w-full rounded-xl bg-gradient-to-r from-rbx-purple to-rbx-red px-6 py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
               >
                 {addingAdmin ? 'Adding...' : '➕ Add Admin'}
               </button>
