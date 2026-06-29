@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/src/lib/supabase/server';
 import { formatStat, getRobloxGameMetadata } from '@/src/lib/roblox';
+import ReviewsSection from '@/src/components/reviews-section';
 
 const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
 
@@ -86,6 +87,9 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
           </div>
         </div>
       </div>
+
+      {/* Reviews Section */}
+      <ReviewsSection gameId={id} />
     </main>
   );
 }
