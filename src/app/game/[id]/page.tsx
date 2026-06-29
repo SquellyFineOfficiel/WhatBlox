@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { createClient } from '@/src/lib/supabase/server';
 import { formatStat, getRobloxGameMetadata } from '@/src/lib/roblox';
 import ReviewsSection from '@/src/components/reviews-section';
+import AddToWishlistButton from '@/src/components/add-to-wishlist-button';
 
 const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
 
@@ -47,14 +48,17 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
               <h1 className="mt-4 text-4xl font-black tracking-tight text-white">{metadata?.title || game.title}</h1>
               <p className="mt-4 max-w-2xl text-base leading-relaxed text-rbx-muted">{metadata?.description || game.description}</p>
             </div>
-            <a
-              href={game.roblox_url}
-              target="_blank"
-              rel="noreferrer"
-              className="self-start rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-8 py-4 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange"
-            >
-              ▶ Play on Roblox
-            </a>
+            <div className="self-start flex gap-3">
+              <a
+                href={game.roblox_url}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-8 py-4 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange"
+              >
+                ▶ Play on Roblox
+              </a>
+              <AddToWishlistButton gameId={id} />
+            </div>
           </div>
         </div>
 
