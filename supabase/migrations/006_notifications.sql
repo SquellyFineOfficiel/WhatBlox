@@ -42,13 +42,13 @@ ALTER TABLE notification_preferences ENABLE ROW LEVEL SECURITY;
 -- RLS Policies: Users can only see their own notifications
 CREATE POLICY notifications_select_policy ON notifications
   FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (auth.uid()::uuid = user_id);
 
 -- RLS Policies: Only update user's own notifications
 CREATE POLICY notifications_update_policy ON notifications
   FOR UPDATE
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+  USING (auth.uid()::uuid = user_id)
+  WITH CHECK (auth.uid()::uuid = user_id);
 
 -- RLS Policies: Only system can insert notifications (via trigger or API with service role)
 -- For this, we'll allow via API only, not directly from client
@@ -56,16 +56,16 @@ CREATE POLICY notifications_update_policy ON notifications
 -- RLS Policies: Users can manage their notification preferences
 CREATE POLICY notification_prefs_select_policy ON notification_preferences
   FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (auth.uid()::uuid = user_id);
 
 CREATE POLICY notification_prefs_insert_policy ON notification_preferences
   FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (auth.uid()::uuid = user_id);
 
 CREATE POLICY notification_prefs_update_policy ON notification_preferences
   FOR UPDATE
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+  USING (auth.uid()::uuid = user_id)
+  WITH CHECK (auth.uid()::uuid = user_id);
 
 -- Function to create default notification preferences when user signs up
 CREATE OR REPLACE FUNCTION create_notification_preferences()

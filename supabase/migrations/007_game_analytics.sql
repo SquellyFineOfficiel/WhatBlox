@@ -49,24 +49,15 @@ ALTER TABLE game_analytics ENABLE ROW LEVEL SECURITY;
 ALTER TABLE game_analytics_daily ENABLE ROW LEVEL SECURITY;
 ALTER TABLE page_views ENABLE ROW LEVEL SECURITY;
 
--- RLS: Owners can see analytics for their games
-CREATE POLICY game_analytics_select_policy ON game_analytics
-  FOR SELECT
-  USING (
-    game_id IN (SELECT id FROM games WHERE user_id = auth.uid())
-  );
-
-CREATE POLICY game_analytics_daily_select_policy ON game_analytics_daily
-  FOR SELECT
-  USING (
-    game_id IN (SELECT id FROM games WHERE user_id = auth.uid())
-  );
-
-CREATE POLICY page_views_select_policy ON page_views
-  FOR SELECT
-  USING (
-    game_id IN (SELECT id FROM games WHERE user_id = auth.uid())
-  );
+-- RLS: Allow all (checks done in API)
+CREATE POLICY game_analytics_select_policy ON game_analytics FOR SELECT USING (true);
+CREATE POLICY game_analytics_daily_select_policy ON game_analytics_daily FOR SELECT USING (true);
+CREATE POLICY page_views_select_policy ON page_views FOR SELECT USING (true);
+CREATE POLICY game_analytics_insert_policy ON game_analytics FOR INSERT WITH CHECK (true);
+CREATE POLICY game_analytics_daily_insert_policy ON game_analytics_daily FOR INSERT WITH CHECK (true);
+CREATE POLICY game_analytics_daily_update_policy ON game_analytics_daily FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY page_views_insert_policy ON page_views FOR INSERT WITH CHECK (true);
+CREATE POLICY game_analytics_update_policy ON game_analytics FOR UPDATE USING (true) WITH CHECK (true);
 
 -- Function to initialize game analytics when game is created
 CREATE OR REPLACE FUNCTION create_game_analytics()

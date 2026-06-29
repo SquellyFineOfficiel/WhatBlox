@@ -41,18 +41,18 @@ CREATE POLICY comments_select_policy ON comments
 -- RLS Policy: Users can only create comments as themselves
 CREATE POLICY comments_insert_policy ON comments
   FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (auth.uid()::uuid = user_id);
 
 -- RLS Policy: Users can only update their own comments
 CREATE POLICY comments_update_policy ON comments
   FOR UPDATE
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+  USING (auth.uid()::uuid = user_id)
+  WITH CHECK (auth.uid()::uuid = user_id);
 
 -- RLS Policy: Users can only delete their own comments
 CREATE POLICY comments_delete_policy ON comments
   FOR DELETE
-  USING (auth.uid() = user_id);
+  USING (auth.uid()::uuid = user_id);
 
 -- RLS Policy: Users can see comment likes (for UI purposes)
 CREATE POLICY comment_likes_select_policy ON comment_likes
@@ -62,12 +62,12 @@ CREATE POLICY comment_likes_select_policy ON comment_likes
 -- RLS Policy: Users can only like comments as themselves
 CREATE POLICY comment_likes_insert_policy ON comment_likes
   FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (auth.uid()::uuid = user_id);
 
 -- RLS Policy: Users can only unlike comments they liked
 CREATE POLICY comment_likes_delete_policy ON comment_likes
   FOR DELETE
-  USING (auth.uid() = user_id);
+  USING (auth.uid()::uuid = user_id);
 
 -- Function to update comment reply_count when replies are added/deleted
 CREATE OR REPLACE FUNCTION update_comment_reply_count()
@@ -88,11 +88,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger to automatically update reply count
-CREATE TRIGGER comment_reply_count_trigger
-AFTER INSERT OR DELETE ON comments
+-- Trigger to automatically update reply count on INSERT
+CREATE TRIGGER comment_reply_count_trigger_insert
+AFTER INSERT ON comments
 FOR EACH ROW
-WHEN (NEW.parent_id IS NOT NULL OR OLD.parent_id IS NOT NULL)
+WHEN (NEW.parent_id IS NOT NULL)
+EXECUTE FUNCTION update_comment_reply_count();
+
+-- Trigger to automatically update reply count on DELETE
+CREATE TRIGGER comment_reply_count_trigger_delete
+AFTER DELETE ON comments
+FOR EACH ROW
+WHEN (OLD.parent_id IS NOT NULL)
 EXECUTE FUNCTION update_comment_reply_count();
 
 -- Function to update comment likes_count
