@@ -33,33 +33,38 @@ export default function ReviewPage() {
         return;
       }
 
-      const { data: adminData } = await supabase.auth.getUser();
-      if (adminData.user) {
+      try {
         // Get current user's Roblox ID from cookies
         const clientUser = getClientUser();
         if (clientUser) {
           // Query admin_users with the Roblox ID
-          const { data: admin } = await supabase
+          const { data: admin, error } = await supabase
             .from('admin_users')
             .select('role')
             .eq('id', clientUser.id)
-            .single();
-          if (admin) {
+            .maybeSingle();
+          
+          if (error) {
+            console.error('Error fetching admin role:', error);
+          } else if (admin) {
             setUserRole(admin.role as AdminRole);
           }
         }
-      }
 
-      const { data } = await supabase
-        .from('games')
-        .select('id,title,description,roblox_url,created_at,user_id,reviewer_message')
-        .eq('status', 'review')
-        .order('created_at', { ascending: true });
+        const { data } = await supabase
+          .from('games')
+          .select('id,title,description,roblox_url,created_at,user_id,reviewer_message')
+          .eq('status', 'review')
+          .order('created_at', { ascending: true });
 
-      if (data) {
-        setGames(data as Game[]);
+        if (data) {
+          setGames(data as Game[]);
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     loadData();

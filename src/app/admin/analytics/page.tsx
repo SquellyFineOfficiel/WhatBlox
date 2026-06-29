@@ -34,13 +34,15 @@ export default function AnalyticsPage() {
         const clientUser = getClientUser();
         if (clientUser) {
           // Query admin_users with the Roblox ID
-          const { data: adminUser } = await supabase
+          const { data: adminUser, error } = await supabase
             .from('admin_users')
             .select('role')
             .eq('id', clientUser.id)
-            .single();
+            .maybeSingle();
 
-          if (adminUser) {
+          if (error) {
+            console.error('Error fetching admin role:', error);
+          } else if (adminUser) {
             setUserRole(adminUser.role as AdminRole);
           }
         }
@@ -81,9 +83,9 @@ export default function AnalyticsPage() {
         });
       } catch (error) {
         console.error('Error loading stats:', error);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
     loadStats();

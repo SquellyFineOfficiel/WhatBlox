@@ -29,31 +29,38 @@ export default function BanGamesPage() {
       const supabase = createClient();
       if (!supabase) return;
 
-      // Get current user's Roblox ID from cookies
-      const clientUser = getClientUser();
-      if (clientUser) {
-        // Query admin_users with the Roblox ID
-        const { data: adminUser } = await supabase
-          .from('admin_users')
-          .select('role')
-          .eq('id', clientUser.id)
-          .single();
+      try {
+        // Get current user's Roblox ID from cookies
+        const clientUser = getClientUser();
+        if (clientUser) {
+          // Query admin_users with the Roblox ID
+          const { data: adminUser, error } = await supabase
+            .from('admin_users')
+            .select('role')
+            .eq('id', clientUser.id)
+            .maybeSingle();
 
-        if (adminUser) {
-          setUserRole(adminUser.role as AdminRole);
+          if (error) {
+            console.error('Error fetching admin role:', error);
+          } else if (adminUser) {
+            setUserRole(adminUser.role as AdminRole);
+          }
         }
-      }
 
-      const { data } = await supabase
-        .from('games')
-        .select('id,title,roblox_url,banned_at,ban_reason')
-        .not('banned_at', 'is', null)
-        .order('banned_at', { ascending: false });
+        const { data } = await supabase
+          .from('games')
+          .select('id,title,roblox_url,banned_at,ban_reason')
+          .not('banned_at', 'is', null)
+          .order('banned_at', { ascending: false });
 
-      if (data) {
-        setGames(data as Game[]);
+        if (data) {
+          setGames(data as Game[]);
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     loadData();

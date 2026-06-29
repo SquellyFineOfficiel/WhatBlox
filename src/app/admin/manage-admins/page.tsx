@@ -33,13 +33,15 @@ export default function ManageAdminsPage() {
         const clientUser = getClientUser();
         if (clientUser) {
           // Query admin_users with the Roblox ID
-          const { data: adminUser } = await supabase
+          const { data: adminUser, error } = await supabase
             .from('admin_users')
             .select('role')
             .eq('id', clientUser.id)
-            .single();
+            .maybeSingle();
           
-          if (adminUser) {
+          if (error) {
+            console.error('Error fetching admin role:', error);
+          } else if (adminUser) {
             setUserRole(adminUser.role as AdminRole);
           }
         }
@@ -52,6 +54,7 @@ export default function ManageAdminsPage() {
 
         if (error) {
           setMessage(`Error loading admins: ${error.message}`);
+          setLoading(false);
           return;
         }
 
@@ -59,16 +62,18 @@ export default function ManageAdminsPage() {
         if (data) {
           const adminsWithEmails: AdminUser[] = [];
           for (const admin of data) {
-            const { data: authUser } = await supabase
+            const { data: authUser, error: authError } = await supabase
               .from('auth.users')
               .select('email')
               .eq('id', admin.id)
-              .single();
+              .maybeSingle();
             
-            adminsWithEmails.push({
-              ...admin,
-              email: authUser?.email || 'Unknown',
-            });
+            if (!authError) {
+              adminsWithEmails.push({
+                ...admin,
+                email: authUser?.email || 'Unknown',
+              });
+            }
           }
           setAdmins(adminsWithEmails);
         }

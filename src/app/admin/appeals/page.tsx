@@ -33,31 +33,38 @@ export default function AppealsPage() {
         return;
       }
 
-      // Get current user's Roblox ID from cookies
-      const clientUser = getClientUser();
-      if (clientUser) {
-        // Query admin_users with the Roblox ID
-        const { data: adminUser } = await supabase
-          .from('admin_users')
-          .select('role')
-          .eq('id', clientUser.id)
-          .single();
+      try {
+        // Get current user's Roblox ID from cookies
+        const clientUser = getClientUser();
+        if (clientUser) {
+          // Query admin_users with the Roblox ID
+          const { data: adminUser, error } = await supabase
+            .from('admin_users')
+            .select('role')
+            .eq('id', clientUser.id)
+            .maybeSingle();
 
-        if (adminUser) {
-          setUserRole(adminUser.role as AdminRole);
+          if (error) {
+            console.error('Error fetching admin role:', error);
+          } else if (adminUser) {
+            setUserRole(adminUser.role as AdminRole);
+          }
         }
-      }
 
-      const { data } = await supabase
-        .from('appeals')
-        .select('*')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: true });
+        const { data } = await supabase
+          .from('appeals')
+          .select('*')
+          .eq('status', 'pending')
+          .order('created_at', { ascending: true });
 
-      if (data) {
-        setAppeals(data as Appeal[]);
+        if (data) {
+          setAppeals(data as Appeal[]);
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     loadData();

@@ -30,32 +30,39 @@ export default function LogsPage() {
         return;
       }
 
-      // Get current user's Roblox ID from cookies
-      const clientUser = getClientUser();
-      if (clientUser) {
-        // Query admin_users with the Roblox ID
-        const { data: adminUser } = await supabase
-          .from('admin_users')
-          .select('role')
-          .eq('id', clientUser.id)
-          .single();
+      try {
+        // Get current user's Roblox ID from cookies
+        const clientUser = getClientUser();
+        if (clientUser) {
+          // Query admin_users with the Roblox ID
+          const { data: adminUser, error } = await supabase
+            .from('admin_users')
+            .select('role')
+            .eq('id', clientUser.id)
+            .maybeSingle();
 
-        if (adminUser) {
-          setUserRole(adminUser.role as AdminRole);
+          if (error) {
+            console.error('Error fetching admin role:', error);
+          } else if (adminUser) {
+            setUserRole(adminUser.role as AdminRole);
+          }
         }
-      }
 
-      let query = supabase.from('moderation_logs').select('*').order('created_at', { ascending: false }).limit(100);
+        let query = supabase.from('moderation_logs').select('*').order('created_at', { ascending: false }).limit(100);
 
-      if (filter !== 'all') {
-        query = query.eq('action', filter);
-      }
+        if (filter !== 'all') {
+          query = query.eq('action', filter);
+        }
 
-      const { data } = await query;
-      if (data) {
-        setLogs(data as Log[]);
+        const { data } = await query;
+        if (data) {
+          setLogs(data as Log[]);
+        }
+      } catch (error) {
+        console.error('Error loading logs:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     loadLogs();
