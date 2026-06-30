@@ -1,12 +1,13 @@
-import '@/src/styles/globals.css';
+import '@/styles/globals.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Script from 'next/script';
 import { Suspense } from 'react';
 import Header from '@/src/components/header';
 
 export const metadata: Metadata = {
   title: 'WhatBlox',
-  description: 'Discover and vote on Roblox games from small developers.',
+  description: 'Discover gem Roblox games',
   icons: {
     icon: '/branding/favicon.png',
     shortcut: '/branding/favicon.png',
@@ -17,7 +18,25 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {/* Google Tag Manager */}
+        <Script id="gtm-script" strategy="afterInteractive">
+          {`(function(w,d,s,l,i) {w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-TNQ838BF');`}
+        </Script>
+        {/* End Google Tag Manager */}
+      </head>
       <body>
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-TNQ838BF"
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
+        {/* End Google Tag Manager (noscript) */}
+
         <a
           href="#main-content"
           className="sr-only z-[60] rounded-md bg-rbx-surface-2 px-4 py-2 text-sm font-semibold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus-visible:ring-2 focus-visible:ring-rbx-orange"
