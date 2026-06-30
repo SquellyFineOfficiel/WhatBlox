@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
 import { Suspense } from 'react';
+import { Analytics } from '@vercel/analytics/next';
 import Header from '@/src/components/header';
 
 export const metadata: Metadata = {
@@ -78,6 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </footer>
         </div>
+        <Analytics />
       </body>
     </html>
   );
