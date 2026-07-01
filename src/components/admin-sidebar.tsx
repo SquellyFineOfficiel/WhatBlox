@@ -1,15 +1,11 @@
 import Link from 'next/link';
+import type { AdminRole } from '@/src/lib/admin';
+import { ADMIN_TOOLS, isToolAccessible } from '@/src/lib/admin-tools';
 
-export type AdminRole = 'super_admin' | 'moderator' | 'reviewer';
-
-export const toolPermissions: Record<string, AdminRole[]> = {
-  'review': ['super_admin', 'reviewer'],
-  'ban-users': ['super_admin', 'moderator'],
-  'ban-games': ['super_admin', 'moderator'],
-  'analytics': ['super_admin', 'moderator'],
-  'logs': ['super_admin', 'moderator'],
-  'appeals': ['super_admin', 'moderator', 'reviewer'],
-  'manage-admins': ['super_admin'],
+const ROLE_LABELS: Record<AdminRole, string> = {
+  super_admin: 'Super admin',
+  moderator: 'Moderator',
+  reviewer: 'Reviewer',
 };
 
 interface AdminSidebarProps {
@@ -18,42 +14,31 @@ interface AdminSidebarProps {
 }
 
 export default function AdminSidebar({ currentPage, userRole = 'reviewer' }: AdminSidebarProps) {
-  const isAccessible = (toolKey: string) => {
-    const allowedRoles = toolPermissions[toolKey] || [];
-    return allowedRoles.includes(userRole);
-  };
-
-  const tools = [
-    { key: 'review', label: '📋 Review Games', href: '/admin/review' },
-    { key: 'ban-users', label: '🚫 Ban Users', href: '/admin/ban-users' },
-    { key: 'ban-games', label: '🎮 Ban Games', href: '/admin/ban-games' },
-    { key: 'analytics', label: '📊 Analytics', href: '/admin/analytics' },
-    { key: 'logs', label: '📝 Moderation Logs', href: '/admin/logs' },
-    { key: 'appeals', label: '🔔 Appeals', href: '/admin/appeals' },
-    { key: 'manage-admins', label: '👑 Manage Admins', href: '/admin/manage-admins' },
-  ];
-
   return (
-    <aside className="w-full md:w-64 rounded-2xl border border-rbx-border bg-rbx-surface p-6 md:sticky md:top-24 md:h-fit">
-      <div className="mb-6">
-        <h3 className="text-sm font-black uppercase tracking-widest text-rbx-muted mb-2">Admin Tools</h3>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-rbx-surface-2 text-xs font-semibold text-rbx-muted">
-          <span className="capitalize">{userRole}</span>
+    <aside className="w-full rounded-2xl border border-rbx-border bg-rbx-surface p-5 md:w-72 md:sticky md:top-24 md:h-fit">
+      <div className="mb-5 rounded-xl border border-rbx-border bg-rbx-surface-2 p-4">
+        <h3 className="text-xs font-black uppercase tracking-widest text-rbx-muted">Admin panel</h3>
+        <div className="mt-2 flex items-center gap-2 rounded-lg border border-rbx-border/70 bg-rbx-surface px-3 py-2 text-xs font-semibold text-white">
+          <span className="h-1.5 w-1.5 rounded-full bg-rbx-orange" />
+          {ROLE_LABELS[userRole]}
         </div>
       </div>
 
       <nav className="space-y-2">
-        {tools.map((tool) => {
-          const canAccess = isAccessible(tool.key);
+        {ADMIN_TOOLS.map((tool) => {
+          const canAccess = isToolAccessible(userRole, tool);
 
           if (!canAccess) {
             return (
               <div
                 key={tool.key}
-                className="px-4 py-3 rounded-xl text-sm text-rbx-muted/50 cursor-not-allowed opacity-50"
+                className="flex items-center justify-between rounded-xl border border-rbx-border/60 px-3 py-2.5 text-sm text-rbx-muted/45 opacity-60"
                 title="You don't have permission to access this tool"
               >
-                {tool.label}
+                <span className="truncate">{tool.icon} {tool.label}</span>
+                <span className="ml-2 rounded-md border border-rbx-border px-1.5 py-0.5 text-[10px] uppercase tracking-wide">
+                  Locked
+                </span>
               </div>
             );
           }
@@ -64,22 +49,28 @@ export default function AdminSidebar({ currentPage, userRole = 'reviewer' }: Adm
             <Link
               key={tool.key}
               href={tool.href}
-              className={`block px-4 py-3 rounded-xl text-sm font-semibold transition ${
+              className={`block rounded-xl border px-3 py-2.5 text-sm font-semibold transition ${
                 isActive
-                  ? 'bg-gradient-to-r from-rbx-red to-rbx-orange text-white'
-                  : 'text-rbx-muted hover:text-white hover:bg-rbx-surface-2'
+                  ? 'border-transparent bg-gradient-to-r from-rbx-red to-rbx-orange text-white'
+                  : 'border-rbx-border text-rbx-muted hover:border-white/20 hover:text-white hover:bg-rbx-surface-2'
               }`}
             >
-              {tool.label}
+              {tool.icon} {tool.label}
             </Link>
           );
         })}
       </nav>
 
-      <div className="mt-8 pt-6 border-t border-rbx-border">
+      <div className="mt-6 space-y-2 border-t border-rbx-border pt-4">
+        <Link
+          href="/admin"
+          className="block rounded-lg px-2 text-xs font-semibold text-rbx-muted transition hover:text-white"
+        >
+          Admin home
+        </Link>
         <Link
           href="/"
-          className="text-xs font-semibold text-rbx-muted hover:text-white transition"
+          className="block rounded-lg px-2 text-xs font-semibold text-rbx-muted transition hover:text-white"
         >
           ← Back to home
         </Link>
