@@ -16,6 +16,13 @@ interface Log {
   created_at: string;
 }
 
+const dateTimeFormatter = new Intl.DateTimeFormat('en', {
+  month: 'short',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+});
+
 export default function LogsPage() {
   const [userRole, setUserRole] = useState<AdminRole>('moderator');
   const [logs, setLogs] = useState<Log[]>([]);
@@ -104,7 +111,9 @@ export default function LogsPage() {
 
           {/* Filters */}
           <div className="mb-8">
+            <label htmlFor="action-filter" className="sr-only">Filter logs by action</label>
             <select
+              id="action-filter"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               className="px-4 py-2 rounded-lg border border-rbx-border bg-rbx-surface-2 text-white text-sm font-semibold"
@@ -132,12 +141,7 @@ export default function LogsPage() {
             <div className="space-y-3">
               {logs.map((log) => {
                 const badge = getActionBadge(log.action);
-                const dateStr = new Date(log.created_at).toLocaleDateString('en', {
-                  month: 'short',
-                  day: 'numeric',
-                   hour: 'numeric',
-                  minute: '2-digit',
-                });
+                const dateStr = dateTimeFormatter.format(new Date(log.created_at));
 
                 return (
                   <div

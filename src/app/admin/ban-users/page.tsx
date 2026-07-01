@@ -95,9 +95,12 @@ export default function BanUsersPage() {
           <form onSubmit={handleBanUser} className="max-w-2xl rounded-2xl border border-rbx-border bg-rbx-surface p-8">
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-bold text-white mb-2">User ID *</label>
+                <label htmlFor="banned-user-id" className="block text-sm font-bold text-white mb-2">User ID *</label>
                 <input
+                  id="banned-user-id"
                   type="text"
+                  name="userId"
+                  autoComplete="off"
                   value={searchUserId}
                   onChange={(e) => setSearchUserId(e.target.value)}
                   placeholder="Enter user UUID"
@@ -106,19 +109,23 @@ export default function BanUsersPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-white mb-2">Ban Reason *</label>
+                <label htmlFor="ban-user-reason" className="block text-sm font-bold text-white mb-2">Ban Reason *</label>
                 <textarea
+                  id="ban-user-reason"
+                  name="banReason"
                   value={banReason}
                   onChange={(e) => setBanReason(e.target.value)}
-                  placeholder="Explain why this user is being banned..."
+                  placeholder="Explain why this user is being banned…"
                   rows={4}
                   className="w-full rounded-xl border border-rbx-border bg-rbx-surface-2 px-4 py-3 text-white placeholder-rbx-muted/50 transition focus:border-rbx-red focus-visible:ring-2 focus-visible:ring-rbx-red"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-white mb-2">Duration</label>
+                <label htmlFor="ban-user-duration" className="block text-sm font-bold text-white mb-2">Duration</label>
                 <select
+                  id="ban-user-duration"
+                  name="banDuration"
                   value={expiresIn}
                   onChange={(e) => setExpiresIn(e.target.value)}
                   className="w-full rounded-xl border border-rbx-border bg-rbx-surface-2 px-4 py-3 text-white transition focus:border-rbx-red"
@@ -135,7 +142,7 @@ export default function BanUsersPage() {
                 disabled={loading}
                 className="w-full rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
               >
-                {loading ? 'Banning...' : '🚫 Ban User'}
+                {loading ? 'Banning…' : '🚫 Ban User'}
               </button>
             </div>
 

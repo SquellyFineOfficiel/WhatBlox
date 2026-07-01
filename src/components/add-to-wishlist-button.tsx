@@ -155,19 +155,23 @@ export default function AddToWishlistButton({ gameId }: { gameId: string }) {
 
             {/* Create new playlist */}
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-white">Create New Playlist</label>
+              <label htmlFor="new-wishlist-name" className="block text-sm font-semibold text-white">Create New Playlist</label>
               <div className="flex gap-2">
                 <input
+                  id="new-wishlist-name"
                   type="text"
+                  name="wishlistName"
+                  autoComplete="off"
                   value={newWishlistName}
                   onChange={(e) => setNewWishlistName(e.target.value)}
-                  placeholder="e.g., Favorites, To Play..."
-                  className="flex-1 rounded-lg border border-rbx-border bg-rbx-surface-2 px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none"
+                  placeholder="e.g., Favorites, To Play…"
+                  className="flex-1 rounded-lg border border-rbx-border bg-rbx-surface-2 px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange"
                   maxLength={100}
                 />
                 <button
                   onClick={handleCreateWishlist}
                   disabled={creatingWishlist}
+                  aria-label="Create playlist"
                   className="rounded-lg bg-rbx-surface-2 px-3 py-2 text-sm font-semibold text-rbx-muted transition hover:text-white disabled:opacity-50"
                 >
                   ➕
@@ -179,7 +183,7 @@ export default function AddToWishlistButton({ gameId }: { gameId: string }) {
             <div className="space-y-2 max-h-64 overflow-y-auto">
               <label className="block text-sm font-semibold text-white">Add to Existing</label>
               {loading ? (
-                <p className="text-sm text-rbx-muted">Loading playlists...</p>
+                <p className="text-sm text-rbx-muted">Loading playlists…</p>
               ) : wishlists.length > 0 ? (
                 <div className="space-y-2">
                   {wishlists.map((wishlist) => (

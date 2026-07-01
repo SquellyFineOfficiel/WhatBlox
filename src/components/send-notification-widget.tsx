@@ -110,7 +110,7 @@ export default function SendNotificationWidget() {
   if (loading) {
     return (
       <div className="rounded-lg border border-rbx-border bg-rbx-surface-2 p-6 text-center">
-        <p className="text-sm text-rbx-muted">Loading your games...</p>
+        <p className="text-sm text-rbx-muted">Loading your games…</p>
       </div>
     );
   }
@@ -144,11 +144,12 @@ export default function SendNotificationWidget() {
 
       <form onSubmit={handleSendNotification} className="space-y-4">
         <div>
-          <label className="block text-sm font-semibold text-white mb-2">Select Game</label>
+          <label htmlFor="notification-game" className="block text-sm font-semibold text-white mb-2">Select Game</label>
           <select
+            id="notification-game"
             value={selectedGameId}
             onChange={(e) => setSelectedGameId(e.target.value)}
-            className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white focus:border-rbx-orange focus:outline-none"
+            className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange"
           >
             {games.map((game) => (
               <option key={game.id} value={game.id}>
@@ -159,27 +160,31 @@ export default function SendNotificationWidget() {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-white mb-2">Notification Title</label>
+          <label htmlFor="notification-title" className="block text-sm font-semibold text-white mb-2">Notification Title</label>
           <input
+            id="notification-title"
             type="text"
+            name="notificationTitle"
+            autoComplete="off"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g., New Update Available"
             maxLength={100}
-            className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none"
+            className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange"
           />
           <p className="mt-1 text-xs text-rbx-muted text-right">{title.length}/100</p>
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-white mb-2">Message</label>
+          <label htmlFor="notification-message" className="block text-sm font-semibold text-white mb-2">Message</label>
           <textarea
+            id="notification-message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Describe the update or news for your followers..."
+            placeholder="Describe the update or news for your followers…"
             maxLength={500}
             rows={4}
-            className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none resize-none"
+            className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange resize-none"
           />
           <p className="mt-1 text-xs text-rbx-muted text-right">{message.length}/500</p>
         </div>
@@ -195,7 +200,7 @@ export default function SendNotificationWidget() {
           disabled={sending}
           className="w-full rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
         >
-          {sending ? 'Sending...' : '📢 Send Notification'}
+          {sending ? 'Sending…' : '📢 Send Notification'}
         </button>
       </form>
     </div>

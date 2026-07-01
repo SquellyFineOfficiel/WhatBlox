@@ -226,6 +226,9 @@ export default function ReviewsSection({ gameId, robloxUrl }: { gameId: string; 
 
   return (
     <div className="space-y-6">
+      <div aria-live="polite" className="sr-only">
+        {error || success}
+      </div>
       <div className="border-b border-rbx-border pb-6">
         <h2 className="text-xl font-black text-white">Reviews & Ratings</h2>
         <p className="mt-1 text-sm text-rbx-muted">See what other players think about this game</p>
@@ -298,7 +301,7 @@ export default function ReviewsSection({ gameId, robloxUrl }: { gameId: string; 
             </div>
           ) : checkingPlayStatus ? (
             <div className="rounded-lg bg-rbx-surface-2 px-4 py-3 text-xs text-rbx-muted">
-              Checking if you've played...
+              Checking if you've played…
             </div>
           ) : (
             <>
@@ -322,13 +325,14 @@ export default function ReviewsSection({ gameId, robloxUrl }: { gameId: string; 
                     </div>
                   )}
 
-                  <div>
-                    <label className="block text-xs font-semibold text-white mb-2">Rating</label>
+                  <fieldset>
+                    <legend className="block text-xs font-semibold text-white mb-2">Rating</legend>
                     <div className="flex gap-2">
                       {[1, 2, 3, 4, 5].map((rating) => (
                         <button
                           key={rating}
                           type="button"
+                          aria-label={`Set rating to ${rating} star${rating === 1 ? '' : 's'}`}
                           onClick={() => setFormData({ ...formData, rating })}
                           className={`text-2xl transition ${
                             rating <= formData.rating ? 'text-rbx-orange' : 'text-rbx-muted hover:text-white'
@@ -338,28 +342,33 @@ export default function ReviewsSection({ gameId, robloxUrl }: { gameId: string; 
                         </button>
                       ))}
                     </div>
-                  </div>
+                  </fieldset>
 
                   <div>
-                    <label className="block text-xs font-semibold text-white mb-2">Title</label>
+                    <label htmlFor="review-title" className="block text-xs font-semibold text-white mb-2">Title</label>
                     <input
+                      id="review-title"
                       type="text"
+                      name="reviewTitle"
+                      autoComplete="off"
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      placeholder="Summarize your experience..."
-                      className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none"
+                      placeholder="Summarize your experience…"
+                      className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange"
                       maxLength={200}
                     />
                     <p className="mt-1 text-xs text-rbx-muted text-right">{formData.title.length}/200</p>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-white mb-2">Review</label>
+                    <label htmlFor="review-content" className="block text-xs font-semibold text-white mb-2">Review</label>
                     <textarea
+                      id="review-content"
+                      name="reviewContent"
                       value={formData.content}
                       onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                      placeholder="Share your thoughts..."
-                      className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none resize-none"
+                      placeholder="Share your thoughts…"
+                      className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange resize-none"
                       rows={4}
                       maxLength={5000}
                     />
@@ -372,7 +381,7 @@ export default function ReviewsSection({ gameId, robloxUrl }: { gameId: string; 
                       disabled={submitting}
                       className="flex-1 rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-2 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
                     >
-                      {submitting ? 'Submitting...' : 'Submit'}
+                      {submitting ? 'Submitting…' : 'Submit'}
                     </button>
                     <button
                       type="button"
@@ -398,14 +407,16 @@ export default function ReviewsSection({ gameId, robloxUrl }: { gameId: string; 
         {reviewsData && reviewsData.reviews.length > 0 ? (
           <>
             <div className="mb-4 flex items-center gap-2">
-              <label className="text-xs font-semibold text-rbx-muted">Sort:</label>
+              <label htmlFor="reviews-sort" className="text-xs font-semibold text-rbx-muted">Sort:</label>
               <select
+                id="reviews-sort"
+                name="reviewsSort"
                 value={sort}
                 onChange={(e) => {
                   setSort(e.target.value);
                   setPage(1);
                 }}
-                className="rounded-lg border border-rbx-border bg-rbx-surface px-3 py-1.5 text-xs text-white focus:border-rbx-orange focus:outline-none"
+                className="rounded-lg border border-rbx-border bg-rbx-surface px-3 py-1.5 text-xs text-white focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange"
               >
                 <option value="recent">Recent</option>
                 <option value="helpful">Most Helpful</option>

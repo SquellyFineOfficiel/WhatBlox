@@ -88,7 +88,7 @@ export default function BanGamesPage() {
       return;
     }
 
-    setMessage('Banning game...');
+    setMessage('Banning game…');
     const supabase = createClient();
     if (!supabase) return;
 
@@ -143,22 +143,27 @@ export default function BanGamesPage() {
               <h2 className="text-lg font-bold text-white mb-6">Ban a Game</h2>
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-bold text-white mb-2">Roblox URL *</label>
+                  <label htmlFor="ban-game-url" className="block text-sm font-bold text-white mb-2">Roblox URL *</label>
                   <input
+                    id="ban-game-url"
                     type="url"
+                    name="robloxUrl"
+                    autoComplete="off"
                     value={robloxUrl}
                     onChange={(e) => setRobloxUrl(e.target.value)}
-                    placeholder="https://www.roblox.com/games/..."
+                    placeholder="https://www.roblox.com/games/…"
                     className="w-full rounded-xl border border-rbx-border bg-rbx-surface-2 px-4 py-3 text-white placeholder-rbx-muted/50 transition focus:border-rbx-red focus-visible:ring-2 focus-visible:ring-rbx-red"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-white mb-2">Ban Reason *</label>
+                  <label htmlFor="ban-game-reason" className="block text-sm font-bold text-white mb-2">Ban Reason *</label>
                   <textarea
+                    id="ban-game-reason"
+                    name="banReason"
                     value={banReason}
                     onChange={(e) => setBanReason(e.target.value)}
-                    placeholder="Explain why this game is being banned..."
+                    placeholder="Explain why this game is being banned…"
                     rows={4}
                     className="w-full rounded-xl border border-rbx-border bg-rbx-surface-2 px-4 py-3 text-white placeholder-rbx-muted/50 transition focus:border-rbx-red focus-visible:ring-2 focus-visible:ring-rbx-red"
                   />
@@ -182,7 +187,7 @@ export default function BanGamesPage() {
             <div>
               <h2 className="text-lg font-bold text-white mb-6">Recently Banned</h2>
               {loading ? (
-                <p className="text-rbx-muted">Loading...</p>
+                <p className="text-rbx-muted">Loading…</p>
               ) : games.length === 0 ? (
                 <p className="text-rbx-muted">No banned games yet</p>
               ) : (

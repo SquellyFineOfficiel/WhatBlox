@@ -37,9 +37,8 @@ export async function GET(req: NextRequest) {
         is_edited,
         created_at,
         updated_at,
-        user_id,
-        profiles:user_id(display_name, avatar_url)
-      `)
+        user_id
+      `, { count: 'exact' })
       .eq('parent_id', commentId)
       .order('created_at', { ascending: true })
       .range(from, to);

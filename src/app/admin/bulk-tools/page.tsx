@@ -14,6 +14,8 @@ type AdminAction = {
   created_at: string;
 };
 
+const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
+
 export default function AdminDashboard() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
@@ -128,7 +130,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <main className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
-        <p className="text-center text-rbx-muted">Loading...</p>
+        <p className="text-center text-rbx-muted">Loading…</p>
       </main>
     );
   }
@@ -165,7 +167,7 @@ export default function AdminDashboard() {
               <select
                 value={selectedAction}
                 onChange={(e) => setSelectedAction(e.target.value)}
-                className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-white focus:border-rbx-orange focus:outline-none"
+                className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-white focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange"
               >
                 <option value="ban_game">Ban Game</option>
                 <option value="unban_game">Unban Game</option>
@@ -179,10 +181,12 @@ export default function AdminDashboard() {
               <label className="block text-sm font-semibold text-white mb-2">Target ID</label>
               <input
                 type="text"
+                name="targetId"
+                autoComplete="off"
                 value={targetId}
                 onChange={(e) => setTargetId(e.target.value)}
                 placeholder="Game/User/Content ID"
-                className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-4 py-2 text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none"
+                className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-4 py-2 text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange"
               />
             </div>
           </div>
@@ -192,8 +196,8 @@ export default function AdminDashboard() {
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Explain why this action is necessary..."
-              className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-4 py-2 text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none"
+              placeholder="Explain why this action is necessary…"
+              className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-4 py-2 text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange"
               rows={3}
               maxLength={500}
             />
@@ -205,7 +209,7 @@ export default function AdminDashboard() {
             disabled={submitting}
             className="rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-2 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
           >
-            {submitting ? 'Executing...' : 'Execute Action'}
+            {submitting ? 'Executing…' : 'Execute Action'}
           </button>
         </form>
       </div>
@@ -219,7 +223,7 @@ export default function AdminDashboard() {
           <select
             value={actionType}
             onChange={(e) => setActionType(e.target.value)}
-            className="mt-2 rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white focus:border-rbx-orange focus:outline-none"
+            className="mt-2 rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange"
           >
             <option value="all">All Actions</option>
             <option value="ban_game">Ban Game</option>
@@ -243,7 +247,7 @@ export default function AdminDashboard() {
                     <p className="mt-1 text-sm text-rbx-muted">{action.reason}</p>
                   </div>
                   <span className="text-xs text-rbx-muted">
-                    {new Date(action.created_at).toLocaleDateString()}
+                    {dateFormatter.format(new Date(action.created_at))}
                   </span>
                 </div>
               </div>

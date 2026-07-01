@@ -176,15 +176,15 @@ function PlaylistContent() {
 
   if (!currentUser) {
     return (
-      <main className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
-        <div className="rounded-xl border border-rbx-border bg-rbx-surface p-10 text-center">
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="rounded-2xl border border-rbx-border bg-rbx-surface p-10 text-center">
           <h1 className="text-3xl font-black text-white">Sign in required</h1>
-          <p className="mt-3 text-sm text-rbx-muted">Please sign in to view your playlists</p>
+          <p className="mt-3 text-sm text-rbx-muted">Please sign in to view your playlists.</p>
           <Link
             href="/auth"
-            className="mt-6 inline-block rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-3 text-sm font-bold text-white transition hover:opacity-90"
+            className="mt-6 inline-block rounded-full bg-gradient-to-r from-rbx-red to-rbx-orange px-6 py-2.5 text-sm font-bold text-white transition hover:opacity-90"
           >
-            Sign In
+            Sign In with Roblox
           </Link>
         </div>
       </main>
@@ -192,28 +192,28 @@ function PlaylistContent() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="space-y-8">
         <div>
-          <h1 className="text-4xl font-black text-white">My Playlists</h1>
-          <p className="mt-2 text-sm text-rbx-muted">Save and organize your favorite Roblox games</p>
+          <h1 className="text-3xl font-black tracking-tight text-white">My Playlists</h1>
+          <p className="mt-1.5 text-sm text-rbx-muted">Save and organize your favorite Roblox games.</p>
         </div>
 
         {error && (
-          <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="rounded-lg border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-400">
+          <div className="rounded-xl border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-400">
             {success}
           </div>
         )}
 
         <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
           {/* Playlists Sidebar */}
-          <div className="rounded-lg border border-rbx-border bg-rbx-surface-2 p-4 h-fit space-y-4">
+          <div className="rounded-2xl border border-rbx-border bg-rbx-surface-2 p-4 h-fit space-y-4">
             <div>
               <h2 className="text-sm font-black uppercase tracking-widest text-white">Playlists</h2>
               <p className="text-xs text-rbx-muted mt-1">{playlists.length} total</p>
@@ -222,25 +222,38 @@ function PlaylistContent() {
             {!showCreateForm ? (
               <button
                 onClick={() => setShowCreateForm(true)}
-                className="w-full rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-2 text-sm font-bold text-white transition hover:opacity-90"
+                className="w-full flex items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-2 text-sm font-bold text-white transition hover:opacity-90"
               >
-                ➕ New Playlist
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                New Playlist
               </button>
             ) : (
               <form onSubmit={(e) => { e.preventDefault(); handleCreatePlaylist(); }} className="space-y-3">
+                <label htmlFor="playlist-name" className="block text-xs font-semibold text-rbx-muted">
+                  Playlist name
+                </label>
                 <input
+                  id="playlist-name"
                   type="text"
+                  name="playlistName"
+                  autoComplete="off"
                   value={newPlaylistName}
                   onChange={(e) => setNewPlaylistName(e.target.value)}
-                  placeholder="Playlist name..."
-                  className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none"
+                  placeholder="Playlist name…"
+                  className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange"
                   maxLength={100}
                 />
+                <label htmlFor="playlist-description" className="block text-xs font-semibold text-rbx-muted">
+                  Description (optional)
+                </label>
                 <textarea
+                  id="playlist-description"
+                  name="playlistDescription"
+                  autoComplete="off"
                   value={newPlaylistDesc}
                   onChange={(e) => setNewPlaylistDesc(e.target.value)}
-                  placeholder="Description (optional)..."
-                  className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none"
+                  placeholder="Description (optional)…"
+                  className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange"
                   rows={2}
                   maxLength={500}
                 />
@@ -274,7 +287,7 @@ function PlaylistContent() {
 
             <div className="space-y-2">
               {loading ? (
-                <p className="text-sm text-rbx-muted">Loading...</p>
+                <p className="text-sm text-rbx-muted">Loading…</p>
               ) : playlists.length > 0 ? (
                 playlists.map((playlist) => (
                   <button
@@ -296,7 +309,7 @@ function PlaylistContent() {
           </div>
 
           {/* Playlist Items */}
-          <div className="rounded-lg border border-rbx-border bg-rbx-surface-2 p-6">
+          <div className="rounded-2xl border border-rbx-border bg-rbx-surface-2 p-6">
             {selectedPlaylist ? (
               <div className="space-y-6">
                 <div>
@@ -339,6 +352,7 @@ function PlaylistContent() {
                           </a>
                           <button
                             onClick={() => handleRemoveItem(item.id)}
+                            aria-label={`Remove ${item.games.title} from playlist`}
                             className="rounded-lg bg-rbx-surface px-3 py-2 text-xs font-bold text-rbx-muted transition hover:text-red-400"
                           >
                             ✕
@@ -374,8 +388,8 @@ function PlaylistContent() {
 export default function PlaylistPage() {
   return (
     <Suspense fallback={
-      <main className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
-        <div className="h-96 animate-pulse rounded-lg border border-rbx-border bg-rbx-surface" />
+    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="h-96 animate-pulse rounded-2xl border border-rbx-border bg-rbx-surface" />
       </main>
     }>
       <PlaylistContent />

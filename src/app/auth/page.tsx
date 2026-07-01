@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import Link from 'next/link';
-import { useState } from 'react';
 import Image from 'next/image';
+import { useState } from 'react';
 
 export default function AuthPage() {
   const [loading, setLoading] = useState(false);
@@ -14,7 +14,7 @@ export default function AuthPage() {
 
     const clientId = process.env.NEXT_PUBLIC_ROBLOX_CLIENT_ID;
     if (!clientId) {
-      setMessage('Add NEXT_PUBLIC_ROBLOX_CLIENT_ID to .env.local to enable Roblox OAuth2.');
+      setMessage('Roblox OAuth is not configured. Add NEXT_PUBLIC_ROBLOX_CLIENT_ID to .env.local.');
       setLoading(false);
       return;
     }
@@ -34,100 +34,120 @@ export default function AuthPage() {
   };
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-4xl items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md">
-        {/* Info Card */}
-        <div className="rounded-2xl border border-rbx-border bg-rbx-surface/50 p-8 backdrop-blur">
-          {/* Header Badge */}
-          <div className="mb-8">
-            <span className="inline-block rounded-md bg-gradient-to-r from-rbx-red to-rbx-orange px-3 py-1 text-[11px] font-black uppercase tracking-widest text-white">
-              Secure Sign In
-            </span>
+    <main className="flex min-h-[calc(100vh-56px)] items-center justify-center px-4 py-16">
+      <div className="w-full max-w-sm animate-scale-in">
+
+        {/* Logo mark */}
+        <div className="mb-8 flex flex-col items-center gap-3">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-rbx-border bg-rbx-surface-2 shadow-lg shadow-black/40">
+            <Image src="/branding/logo.png" alt="WhatBlox" width={36} height={36} className="rounded-lg" priority />
           </div>
-
-          {/* Main Heading */}
-          <h1 className="text-3xl font-black tracking-tight text-white mb-2">
-            Sign in to WhatBlox
-          </h1>
-          <p className="text-sm leading-6 text-rbx-muted mb-6">
-            Use your Roblox account to access WhatBlox. No password needed, no bots.
-          </p>
-
-          {/* Benefits Section */}
-          <div className="space-y-3 mb-8 rounded-xl border border-rbx-border bg-rbx-surface-2 p-4">
-            <div className="flex items-start gap-3">
-              <span className="text-rbx-orange mt-0.5">✓</span>
-              <div>
-                <p className="text-sm font-semibold text-white">One-Click Login</p>
-                <p className="text-xs text-rbx-muted">Approve on Roblox and you're in</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="text-rbx-orange mt-0.5">✓</span>
-              <div>
-                <p className="text-sm font-semibold text-white">No Passwords</p>
-                <p className="text-xs text-rbx-muted">Your Roblox account is your password</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="text-rbx-orange mt-0.5">✓</span>
-              <div>
-                <p className="text-sm font-semibold text-white">Bot-Free</p>
-                <p className="text-xs text-rbx-muted">Real Roblox accounts only</p>
-              </div>
-            </div>
-          </div>
-
-          {/* CTA Button */}
-          <button
-            type="button"
-            onClick={handleRobloxLogin}
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Image
-              src="/branding/roblox-logo.svg"
-              alt="Roblox logo"
-              width={20}
-              height={20}
-              className="h-5 w-5"
-            />
-            {loading ? 'Connecting to Roblox…' : 'Continue with Roblox'}
-          </button>
-
-          {/* Legal Text */}
-          <p className="mt-6 text-xs leading-5 text-rbx-muted text-center">
-            By continuing, you agree to the{' '}
-            <Link href="/terms-of-service" className="text-white underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-rbx-orange">
-              Terms of Service
-            </Link>
-            {' '}and{' '}
-            <Link href="/privacy-policy" className="text-white underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-rbx-orange">
-              Privacy Policy
-            </Link>
-            .
-          </p>
-
-          {/* Error Messages */}
-          <div aria-live="polite">
-            {message && (
-              <div className="mt-6 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-                {message}
-              </div>
-            )}
+          <div className="text-center">
+            <h1 className="text-2xl font-black tracking-tight text-white">Welcome to WhatBlox</h1>
+            <p className="mt-1.5 text-sm text-rbx-muted">The place where hidden gems get discovered.</p>
           </div>
         </div>
 
-        {/* Footer Info */}
-        <p className="mt-8 text-center text-xs text-rbx-muted">
-          Don't have a Roblox account?{' '}
+        {/* Card */}
+        <div className="overflow-hidden rounded-2xl border border-rbx-border bg-rbx-surface shadow-2xl shadow-black/40">
+
+          {/* Sign in button — top prominence */}
+          <div className="px-6 pt-6 pb-5">
+            <button
+              type="button"
+              onClick={handleRobloxLogin}
+              disabled={loading}
+              className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-rbx-red to-rbx-orange px-5 py-3.5 text-sm font-bold text-white transition-all duration-200 hover:opacity-90 hover:shadow-lg hover:shadow-rbx-orange/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-rbx-orange"
+            >
+              <span className="flex items-center justify-center gap-2.5">
+                <Image
+                  src="/branding/roblox-logo.svg"
+                  alt=""
+                  width={18}
+                  height={18}
+                  className="h-[18px] w-[18px]"
+                />
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                    Connecting…
+                  </span>
+                ) : 'Continue with Roblox'}
+              </span>
+            </button>
+
+            {message && (
+              <p className="mt-3 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2.5 text-xs text-red-400 animate-fade-in">
+                {message}
+              </p>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div className="mx-6 h-px bg-rbx-border/60" />
+
+          {/* Feature list */}
+          <div className="space-y-0">
+            {[
+              {
+                icon: (
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                ),
+                label: 'No password needed',
+                sub: 'Your Roblox account is all you need',
+              },
+              {
+                icon: (
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                  </svg>
+                ),
+                label: 'Real accounts only',
+                sub: 'Verified Roblox identity, no bots',
+              },
+              {
+                icon: (
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                  </svg>
+                ),
+                label: 'Instant access',
+                sub: 'Vote, review and share in seconds',
+              },
+            ].map((feat, i) => (
+              <div key={i} className={`flex items-start gap-3 px-6 py-4 ${i < 2 ? 'border-b border-rbx-border/40' : ''}`}>
+                <span className="mt-0.5 shrink-0 text-rbx-orange">{feat.icon}</span>
+                <div>
+                  <p className="text-sm font-semibold text-white">{feat.label}</p>
+                  <p className="text-xs text-rbx-muted">{feat.sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Legal */}
+          <div className="border-t border-rbx-border/60 px-6 py-4">
+            <p className="text-center text-[11px] leading-5 text-rbx-muted">
+              By continuing you agree to our{' '}
+              <Link href="/terms-of-service" className="text-white underline-offset-2 hover:underline">Terms</Link>
+              {' '}and{' '}
+              <Link href="/privacy-policy" className="text-white underline-offset-2 hover:underline">Privacy Policy</Link>.
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <p className="mt-6 text-center text-xs text-rbx-muted">
+          No Roblox account?{' '}
           <a
             href="https://www.roblox.com/login"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-rbx-orange hover:underline focus-visible:ring-2 focus-visible:ring-rbx-orange rounded"
+            className="text-rbx-orange hover:underline underline-offset-2"
           >
-            Create one free
+            Create one free →
           </a>
         </p>
       </div>

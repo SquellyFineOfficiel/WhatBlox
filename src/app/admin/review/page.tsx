@@ -23,6 +23,7 @@ export default function ReviewPage() {
   const [userRole, setUserRole] = useState<AdminRole>('reviewer');
   const [metadataMap, setMetadataMap] = useState<Record<string, any>>({});
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
   const [actionMessage, setActionMessage] = useState('');
 
   useEffect(() => {
@@ -89,7 +90,7 @@ export default function ReviewPage() {
     const supabase = createClient();
     if (!supabase) return;
 
-    setActionMessage('Approving...');
+    setActionMessage('Approving…');
     const { error } = await supabase
       .from('games')
       .update({ status: 'approved' })
@@ -100,6 +101,7 @@ export default function ReviewPage() {
     } else {
       setGames(games.filter((g) => g.id !== gameId));
       setSelectedGame(null);
+      setRejectReason('');
       setActionMessage('Game approved! ✓');
       setTimeout(() => setActionMessage(''), 2000);
     }
@@ -109,7 +111,7 @@ export default function ReviewPage() {
     const supabase = createClient();
     if (!supabase) return;
 
-    setActionMessage('Rejecting...');
+    setActionMessage('Rejecting…');
     const { error } = await supabase
       .from('games')
       .update({ status: 'rejected', rejection_reason: reason })
@@ -120,6 +122,7 @@ export default function ReviewPage() {
     } else {
       setGames(games.filter((g) => g.id !== gameId));
       setSelectedGame(null);
+      setRejectReason('');
       setActionMessage('Game rejected.');
       setTimeout(() => setActionMessage(''), 2000);
     }
@@ -150,10 +153,11 @@ export default function ReviewPage() {
               {games.map((game) => {
                 const info = metadataMap[game.id];
                 return (
-                  <article
+                  <button
+                    type="button"
                     key={game.id}
                     onClick={() => setSelectedGame(game)}
-                    className={`cursor-pointer rounded-2xl border transition ${
+                    className={`w-full rounded-2xl border text-left transition ${
                       selectedGame?.id === game.id
                         ? 'border-rbx-orange bg-rbx-surface-2'
                         : 'border-rbx-border bg-rbx-surface hover:border-rbx-orange/50 hover:bg-rbx-surface-2'
@@ -164,6 +168,8 @@ export default function ReviewPage() {
                         <img
                           src={info.thumbnail_url}
                           alt={game.title}
+                          width={128}
+                          height={96}
                           className="h-24 w-32 rounded-lg object-cover"
                         />
                       ) : (
@@ -184,7 +190,7 @@ export default function ReviewPage() {
                         </div>
                       </div>
                     </div>
-                  </article>
+                  </button>
                 );
               })}
             </div>
@@ -217,13 +223,23 @@ export default function ReviewPage() {
                 >
                   ✓ Approve
                 </button>
+                <div>
+                  <label htmlFor="rejection-reason" className="mb-2 block text-sm font-semibold text-white">
+                    Rejection reason
+                  </label>
+                  <textarea
+                    id="rejection-reason"
+                    name="rejectionReason"
+                    value={rejectReason}
+                    onChange={(e) => setRejectReason(e.target.value)}
+                    placeholder="Explain why this game is being rejected…"
+                    rows={3}
+                    className="w-full rounded-lg border border-rbx-border bg-rbx-surface-2 px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-red focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-red"
+                  />
+                </div>
                 <button
-                  onClick={() => {
-                    const reason = prompt('Rejection reason:');
-                    if (reason) {
-                      handleReject(selectedGame.id, reason);
-                    }
-                  }}
+                  onClick={() => handleReject(selectedGame.id, rejectReason.trim())}
+                  disabled={!rejectReason.trim()}
                   className="w-full rounded-lg bg-rbx-red/20 border border-rbx-red/50 px-4 py-2 text-sm font-bold text-rbx-red hover:bg-rbx-red/30 transition"
                 >
                   ✗ Reject
@@ -231,7 +247,7 @@ export default function ReviewPage() {
               </div>
 
               {actionMessage && (
-                <p className="mt-4 text-center text-sm text-rbx-muted">{actionMessage}</p>
+                <p aria-live="polite" className="mt-4 text-center text-sm text-rbx-muted">{actionMessage}</p>
               )}
             </div>
           )}

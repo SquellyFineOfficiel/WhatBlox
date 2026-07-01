@@ -1,5 +1,5 @@
 import '@/src/app/globals.css';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
 import { Suspense } from 'react';
@@ -13,6 +13,10 @@ export const metadata: Metadata = {
     shortcut: '/branding/favicon.png',
     apple: '/branding/favicon.png',
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#080810',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -59,13 +63,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to main content
         </a>
         <div className="min-h-screen bg-rbx-bg">
-          <div className="h-[3px] w-full bg-gradient-to-r from-rbx-purple via-rbx-red to-rbx-orange" />
-          <Suspense fallback={<div className="h-20 bg-rbx-surface" />}>
+          <Suspense fallback={<div className="h-16 bg-rbx-surface" />}>
             <Header />
           </Suspense>
-          <div id="main-content">{children}</div>
-          <footer className="border-t border-rbx-border bg-rbx-surface/80">
-            <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm text-rbx-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <div id="main-content" className="pt-28 md:pt-16">{children}</div>
+          <footer className="border-t border-rbx-border bg-rbx-surface/70 backdrop-blur">
+            <div className="mx-auto flex max-w-[1600px] flex-col gap-4 px-4 py-8 text-sm text-rbx-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
               <p>© {new Date().getFullYear()} WhatBlox</p>
               <div className="flex items-center gap-6">
                 <Link href="/privacy-policy" className="rounded-md transition hover:text-white focus-visible:ring-2 focus-visible:ring-rbx-orange">

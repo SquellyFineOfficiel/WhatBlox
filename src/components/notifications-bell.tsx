@@ -12,6 +12,8 @@ type Notification = {
   created_at: string;
 };
 
+const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
+
 export default function NotificationsBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -144,7 +146,7 @@ export default function NotificationsBell() {
     return (
       <Link
         href="/auth"
-        className="rounded-lg p-2 text-rbx-muted transition hover:text-white hover:bg-rbx-surface-2"
+        className="relative flex h-9 w-9 items-center justify-center rounded-full bg-rbx-surface-2 text-rbx-muted transition hover:bg-rbx-surface-3 hover:text-white"
         title="Sign in to enable notifications"
       >
         🔔
@@ -156,12 +158,13 @@ export default function NotificationsBell() {
     <div className="relative">
       <button
         onClick={() => setShowDropdown(!showDropdown)}
-        className="relative rounded-lg p-2 text-rbx-muted transition hover:text-white hover:bg-rbx-surface-2"
+        aria-label="Toggle notifications menu"
+        className="relative flex h-9 w-9 items-center justify-center rounded-full bg-rbx-surface-2 text-rbx-muted transition hover:bg-rbx-surface-3 hover:text-white"
         title="Notifications"
       >
         {notificationsEnabled ? '🔔' : '🔇'}
         {unreadCount > 0 && notificationsEnabled && (
-          <span className="absolute top-0 right-0 flex items-center justify-center w-5 h-5 rounded-full bg-rbx-orange text-white text-xs font-bold">
+          <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-rbx-orange text-xs font-bold text-white">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -174,6 +177,7 @@ export default function NotificationsBell() {
             <button
               onClick={handleToggleNotifications}
               disabled={togglingNotifications}
+              aria-label={notificationsEnabled ? 'Disable notifications' : 'Enable notifications'}
               title={notificationsEnabled ? 'Disable notifications' : 'Enable notifications'}
               className={`text-lg transition ${notificationsEnabled ? 'text-rbx-orange hover:text-white' : 'text-rbx-muted hover:text-white'}`}
             >
@@ -196,7 +200,7 @@ export default function NotificationsBell() {
 
           {loading ? (
             <div className="px-4 py-8 text-center text-sm text-rbx-muted">
-              Loading...
+              Loading…
             </div>
           ) : notifications.length > 0 ? (
             <div className="max-h-96 overflow-y-auto">
@@ -214,7 +218,7 @@ export default function NotificationsBell() {
                         {notif.message}
                       </p>
                       <p className="mt-2 text-xs text-rbx-muted">
-                        {new Date(notif.created_at).toLocaleDateString()}
+                        {dateFormatter.format(new Date(notif.created_at))}
                       </p>
                     </div>
                     {!notif.read && (

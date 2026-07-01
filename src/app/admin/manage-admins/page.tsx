@@ -13,6 +13,8 @@ interface AdminUser {
   created_at: string;
 }
 
+const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
+
 export default function ManageAdminsPage() {
   const [userRole, setUserRole] = useState<AdminRole>('moderator');
   const [admins, setAdmins] = useState<AdminUser[]>([]);
@@ -241,9 +243,12 @@ export default function ManageAdminsPage() {
             
             <form onSubmit={handleAddAdmin} className="space-y-6">
               <div>
-                <label className="block text-sm font-bold text-white mb-2">Roblox User ID or Username *</label>
+                <label htmlFor="new-admin-identifier" className="block text-sm font-bold text-white mb-2">Roblox User ID or Username *</label>
                 <input
+                  id="new-admin-identifier"
                   type="text"
+                  name="adminIdentifier"
+                  autoComplete="off"
                   value={newAdminEmail}
                   onChange={(e) => setNewAdminEmail(e.target.value)}
                   placeholder="12345 or username"
@@ -253,8 +258,10 @@ export default function ManageAdminsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-white mb-2">Role</label>
+                <label htmlFor="new-admin-role" className="block text-sm font-bold text-white mb-2">Role</label>
                 <select
+                  id="new-admin-role"
+                  name="newAdminRole"
                   value={newAdminRole}
                   onChange={(e) => setNewAdminRole(e.target.value as AdminRole)}
                   className="w-full rounded-xl border border-rbx-border bg-rbx-surface-2 px-4 py-3 text-white transition focus:border-rbx-purple"
@@ -270,7 +277,7 @@ export default function ManageAdminsPage() {
                 disabled={addingAdmin}
                 className="w-full rounded-xl bg-gradient-to-r from-rbx-purple to-rbx-red px-6 py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
               >
-                {addingAdmin ? 'Adding...' : '➕ Add Admin'}
+                {addingAdmin ? 'Adding…' : '➕ Add Admin'}
               </button>
             </form>
           </div>
@@ -280,7 +287,7 @@ export default function ManageAdminsPage() {
             <h2 className="text-2xl font-bold text-white mb-6">Current Admins</h2>
             
             {loading ? (
-              <p className="text-rbx-muted">Loading admins...</p>
+              <p className="text-rbx-muted">Loading admins…</p>
             ) : admins.length === 0 ? (
               <p className="text-rbx-muted">No admins found</p>
             ) : (
@@ -290,11 +297,12 @@ export default function ManageAdminsPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-white truncate">{admin.email}</p>
                       <p className="text-xs text-rbx-muted">ID: {admin.id}</p>
-                      <p className="text-xs text-rbx-muted">Added: {new Date(admin.created_at).toLocaleDateString()}</p>
+                      <p className="text-xs text-rbx-muted">Added: {dateFormatter.format(new Date(admin.created_at))}</p>
                     </div>
 
                     <div className="flex items-center gap-2">
                       <select
+                        aria-label={`Change role for ${admin.email || admin.id}`}
                         value={admin.role}
                         onChange={(e) => handleChangeRole(admin.id, e.target.value as AdminRole)}
                         className="rounded-lg border border-rbx-border bg-rbx-surface-2 px-3 py-2 text-sm font-semibold text-white transition focus:border-rbx-purple"

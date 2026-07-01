@@ -186,9 +186,12 @@ function SearchContent() {
         <form onSubmit={handleSearch} className="flex gap-3">
           <input
             type="text"
+            name="q"
+            autoComplete="off"
+            aria-label="Search for games"
             value={searchInput || query}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Search for games..."
+            placeholder="Search for games…"
             className="flex-1 rounded-xl border border-rbx-border bg-rbx-surface px-5 py-3 text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange"
           />
           <button
@@ -201,11 +204,13 @@ function SearchContent() {
 
         {/* Filters and Sort */}
         <div className="flex flex-wrap items-center gap-3">
-          <label className="text-sm font-semibold text-rbx-muted">Sort by:</label>
+          <label htmlFor="search-sort" className="text-sm font-semibold text-rbx-muted">Sort by:</label>
           <select
+            id="search-sort"
+            name="searchSort"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white focus:border-rbx-orange focus:outline-none"
+            className="rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange"
           >
             <option value="newest">Newest</option>
             <option value="oldest">Oldest</option>

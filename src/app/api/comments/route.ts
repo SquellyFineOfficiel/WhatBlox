@@ -37,9 +37,8 @@ export async function GET(req: NextRequest) {
         created_at,
         updated_at,
         user_id,
-        parent_id,
-        profiles:user_id(display_name, avatar_url)
-      `)
+        parent_id
+      `, { count: 'exact' })
       .eq('game_id', gameId)
       .is('parent_id', null);
 
@@ -169,8 +168,7 @@ export async function POST(req: NextRequest) {
         created_at,
         updated_at,
         user_id,
-        parent_id,
-        profiles:user_id(display_name, avatar_url)
+        parent_id
       `)
       .single();
 

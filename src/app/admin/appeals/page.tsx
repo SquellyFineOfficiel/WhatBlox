@@ -17,6 +17,8 @@ interface Appeal {
   created_at: string;
 }
 
+const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
+
 export default function AppealsPage() {
   const [userRole, setUserRole] = useState<AdminRole>('reviewer');
   const [appeals, setAppeals] = useState<Appeal[]>([]);
@@ -74,7 +76,7 @@ export default function AppealsPage() {
     const supabase = createClient();
     if (!supabase) return;
 
-    setMessage('Processing...');
+    setMessage('Processing…');
     const { error } = await supabase
       .from('appeals')
       .update({ status: 'approved', admin_response: response, reviewed_at: new Date().toISOString() })
@@ -95,7 +97,7 @@ export default function AppealsPage() {
     const supabase = createClient();
     if (!supabase) return;
 
-    setMessage('Processing...');
+    setMessage('Processing…');
     const { error } = await supabase
       .from('appeals')
       .update({ status: 'rejected', admin_response: response, reviewed_at: new Date().toISOString() })
@@ -135,10 +137,11 @@ export default function AppealsPage() {
           ) : (
             <div className="space-y-4">
               {appeals.map((appeal) => (
-                <article
+                <button
+                  type="button"
                   key={appeal.id}
                   onClick={() => setSelectedAppeal(appeal)}
-                  className={`cursor-pointer rounded-2xl border transition p-6 ${
+                  className={`w-full cursor-pointer rounded-2xl border p-6 text-left transition ${
                     selectedAppeal?.id === appeal.id
                       ? 'border-rbx-orange bg-rbx-surface-2'
                       : 'border-rbx-border bg-rbx-surface hover:border-rbx-orange/50'
@@ -151,13 +154,13 @@ export default function AppealsPage() {
                           {appeal.target_type === 'game' ? '🎮 Game Ban' : '🚫 User Ban'}
                         </span>
                         <span className="text-xs text-rbx-muted">
-                          {new Date(appeal.created_at).toLocaleDateString()}
+                          {dateFormatter.format(new Date(appeal.created_at))}
                         </span>
                       </div>
                       <p className="text-sm text-white line-clamp-2">{appeal.reason}</p>
                     </div>
                   </div>
-                </article>
+                </button>
               ))}
             </div>
           )}
@@ -187,7 +190,7 @@ export default function AppealsPage() {
                 <textarea
                   value={response}
                   onChange={(e) => setResponse(e.target.value)}
-                  placeholder="Explain your decision..."
+                  placeholder="Explain your decision…"
                   rows={4}
                   className="w-full rounded-lg border border-rbx-border bg-rbx-surface-2 px-3 py-2 text-sm text-white placeholder-rbx-muted/50 transition focus:border-rbx-red"
                 />

@@ -14,10 +14,6 @@ type Comment = {
   updated_at: string;
   user_id: string;
   parent_id: string | null;
-  profiles?: {
-    display_name: string;
-    avatar_url: string | null;
-  };
 };
 
 type CommentsResponse = {
@@ -205,6 +201,9 @@ export default function CommentsSection({ gameId }: { gameId: string }) {
             </button>
           ) : (
             <form onSubmit={handleSubmitComment} className="rounded-xl border border-rbx-border bg-rbx-surface-2 p-5 space-y-4">
+              <div aria-live="polite" className="sr-only">
+                {error}
+              </div>
               {error && (
                 <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-400">
                   {error}
@@ -213,10 +212,11 @@ export default function CommentsSection({ gameId }: { gameId: string }) {
 
               <div>
                 <textarea
+                  aria-label="Write a comment"
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Share your thoughts..."
-                  className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none resize-none"
+                  placeholder="Share your thoughts…"
+                  className="w-full rounded-lg border border-rbx-border bg-rbx-surface px-3 py-2 text-sm text-white placeholder:text-rbx-muted focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange resize-none"
                   rows={4}
                   maxLength={5000}
                 />
@@ -229,7 +229,7 @@ export default function CommentsSection({ gameId }: { gameId: string }) {
                   disabled={submitting}
                   className="flex-1 rounded-lg bg-gradient-to-r from-rbx-red to-rbx-orange px-4 py-2 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
                 >
-                  {submitting ? 'Posting...' : 'Post'}
+                  {submitting ? 'Posting…' : 'Post'}
                 </button>
                 <button
                   type="button"
@@ -258,19 +258,21 @@ export default function CommentsSection({ gameId }: { gameId: string }) {
       <div>
         {loading ? (
           <div className="rounded-lg bg-rbx-surface-2 px-6 py-8 text-center">
-            <p className="text-xs text-rbx-muted">Loading...</p>
+            <p className="text-xs text-rbx-muted">Loading…</p>
           </div>
         ) : commentsData && commentsData.comments.length > 0 ? (
           <>
             <div className="mb-4 flex items-center gap-2">
-              <label className="text-xs font-semibold text-rbx-muted">Sort:</label>
+              <label htmlFor="comments-sort" className="text-xs font-semibold text-rbx-muted">Sort:</label>
               <select
+                id="comments-sort"
+                name="commentsSort"
                 value={sort}
                 onChange={(e) => {
                   setSort(e.target.value);
                   setPage(1);
                 }}
-                className="rounded-lg border border-rbx-border bg-rbx-surface px-3 py-1.5 text-xs text-white focus:border-rbx-orange focus:outline-none"
+                className="rounded-lg border border-rbx-border bg-rbx-surface px-3 py-1.5 text-xs text-white focus:border-rbx-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-rbx-orange"
               >
                 <option value="recent">Recent</option>
                 <option value="trending">Most Liked</option>
@@ -285,7 +287,7 @@ export default function CommentsSection({ gameId }: { gameId: string }) {
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-white text-sm truncate">{comment.profiles?.display_name || 'Anonymous'}</span>
+                          <span className="font-semibold text-white text-sm truncate">{comment.user_id === currentUser?.id ? 'You' : 'Player'}</span>
                           <span className="text-xs text-rbx-muted shrink-0">
                             {dateFormatter.format(new Date(comment.created_at))}
                             {comment.is_edited && ' (edited)'}
