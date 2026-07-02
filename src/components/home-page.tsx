@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { createClient } from '@/src/lib/supabase/client';
+import { getClientUser } from '@/src/lib/auth-client';
 import { calculateTrendingScore } from '@/src/lib/game-ranking';
 import { formatStat, getRobloxGameMetadata, type RobloxMetadata } from '@/src/lib/roblox';
 import AdBanner from '@/src/components/ad-banner';
@@ -32,6 +33,17 @@ type UserActivity = {
   upvotesPerGame: Record<string, number>;
   recentReviews: { gameId: string; gameTitle: string; rating: number; reviewTitle: string; createdAt: string }[];
 };
+
+type VoteAgg = { up: number; down: number; score: number };
+
+type RecentlyViewedItem = {
+  id: string;
+  title: string;
+  thumbnailUrl: string | null;
+  visitedAt: string;
+};
+
+const RECENTLY_VIEWED_KEY = 'whatblox_recently_viewed';
 
 const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
 
@@ -102,11 +114,13 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [votes, setVotes] = useState<Record<string, Vote>>({});
+  const [voteCounts, setVoteCounts] = useState<Record<string, VoteAgg>>({});
   const [statusMessage, setStatusMessage] = useState('');
   const [metadataMap, setMetadataMap] = useState<Record<string, RobloxMetadata | null>>({});
   const [clientUser, setClientUser] = useState<{ id: string } | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [userActivity, setUserActivity] = useState<UserActivity | null>(null);
+  const [recentlyViewed, setRecentlyViewed] = useState<RecentlyViewedItem[]>([]);
   const activeUser = user || clientUser;
 
   useEffect(() => {
@@ -115,12 +129,18 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
   }, []);
 
   useEffect(() => {
-    const supabase = createClient();
-    if (!supabase) return;
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = window.localStorage.getItem(RECENTLY_VIEWED_KEY);
+      const items = raw ? (JSON.parse(raw) as RecentlyViewedItem[]) : [];
+      setRecentlyViewed(items.slice(0, 8));
+    } catch {
+      setRecentlyViewed([]);
+    }
+  }, []);
 
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) setClientUser({ id: data.user.id });
-    });
+  useEffect(() => {
+    setClientUser(getClientUser());
 
     async function loadGames() {
       if (!isConfigured) {
@@ -209,11 +229,42 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
     return () => { ignore = true; };
   }, [games]);
 
+  useEffect(() => {
+    let ignore = false;
+    if (!games.length) return;
+    const load = async () => {
+      try {
+        const ids = games.map(g => g.id).join(',');
+        const res = await fetch(`/api/votes?gameIds=${encodeURIComponent(ids)}`);
+        if (res.ok) {
+          const { voteCounts: counts } = await res.json();
+          if (!ignore) setVoteCounts(counts ?? {});
+        }
+      } catch {
+        // Vote counts are a nice-to-have; ignore failures silently.
+      }
+    };
+    load();
+    return () => { ignore = true; };
+  }, [games]);
+
   const handleVote = async (gameId: string, value: number) => {
     if (!isConfigured || !activeUser) { setStatusMessage('Sign in to vote.'); return; }
     const supabase = createClient();
     if (!supabase) return;
     const existing = votes[gameId];
+    setVoteCounts(prev => {
+      const current = prev[gameId] ?? { up: 0, down: 0, score: 0 };
+      const next = { ...current };
+      if (existing?.value === 1) next.up -= 1;
+      if (existing?.value === -1) next.down -= 1;
+      if (existing?.value !== value) {
+        if (value === 1) next.up += 1;
+        else next.down += 1;
+      }
+      next.score = next.up - next.down;
+      return { ...prev, [gameId]: next };
+    });
     if (existing?.value === value) {
       await supabase.from('votes').delete().eq('id', existing.id);
       setVotes(prev => { const n = { ...prev }; delete n[gameId]; return n; });
@@ -376,6 +427,7 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
                 const metadata = metadataMap[game.id];
                 const title = metadata?.title || game.title;
                 const userVote = votes[game.id];
+                const score = voteCounts[game.id]?.score ?? 0;
                 return (
                   <article
                     key={game.id}
@@ -408,7 +460,7 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
                           type="button"
                           aria-label={`Upvote ${title}`}
                           onClick={() => handleVote(game.id, 1)}
-                          className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold transition ${
+                          className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold transition active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange ${
                             userVote?.value === 1
                               ? 'bg-rbx-orange text-white shadow-md shadow-rbx-orange/20'
                               : 'bg-rbx-surface-2 text-rbx-muted hover:text-white'
@@ -416,11 +468,12 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
                         >
                           <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2z"/></svg>
                         </button>
+                        <span className="min-w-[1.25rem] text-center text-xs font-black tabular-nums text-white">{score}</span>
                         <button
                           type="button"
                           aria-label={`Downvote ${title}`}
                           onClick={() => handleVote(game.id, -1)}
-                          className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold transition ${
+                          className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold transition active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange ${
                             userVote?.value === -1
                               ? 'bg-rbx-red text-white'
                               : 'bg-rbx-surface-2 text-rbx-muted hover:text-white'
@@ -432,7 +485,7 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
                           href={game.roblox_url}
                           target="_blank"
                           rel="noreferrer"
-                          className="ml-auto rounded-full bg-gradient-to-r from-rbx-red to-rbx-orange px-3.5 py-1.5 text-xs font-bold text-white transition hover:opacity-90 hover:shadow-md hover:shadow-rbx-orange/20"
+                          className="ml-auto rounded-full bg-gradient-to-r from-rbx-red to-rbx-orange px-3.5 py-1.5 text-xs font-bold text-white transition hover:opacity-90 hover:shadow-md hover:shadow-rbx-orange/20 active:scale-95 focus-visible:ring-2 focus-visible:ring-rbx-orange"
                         >
                           Play
                         </a>
@@ -443,6 +496,32 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
               })}
             </div>
           </section>
+
+          {/* ── Recently viewed ── */}
+          {recentlyViewed.length > 0 && (
+            <section className="animate-fade-up-slow">
+              <div className="mb-5 flex items-end justify-between gap-3">
+                <div>
+                  <h2 className="text-2xl font-black tracking-tight text-white sm:text-3xl">Recently viewed</h2>
+                  <p className="mt-0.5 text-sm text-rbx-muted">Pick up where you left off</p>
+                </div>
+              </div>
+              <div className="flex gap-3 overflow-x-auto pb-1">
+                {recentlyViewed.map(item => (
+                  <Link
+                    key={item.id}
+                    href={`/game/${item.id}`}
+                    className="group w-40 shrink-0 overflow-hidden rounded-xl border border-rbx-border bg-rbx-surface transition hover:border-white/20 hover:-translate-y-0.5"
+                  >
+                    <div className="h-24 overflow-hidden bg-rbx-surface-3">
+                      <Thumbnail title={item.title} thumbnailUrl={item.thumbnailUrl} />
+                    </div>
+                    <p className="line-clamp-1 p-2.5 text-xs font-bold text-white group-hover:text-rbx-orange transition">{item.title}</p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Ad — between Trending and Newest */}
           <AdBanner

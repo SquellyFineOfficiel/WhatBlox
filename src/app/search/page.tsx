@@ -5,6 +5,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getRobloxGameMetadata, type RobloxMetadata, formatStat } from '@/src/lib/roblox';
 import { createClient } from '@/src/lib/supabase/client';
+import { getClientUser } from '@/src/lib/auth-client';
 
 type Game = {
   id: string;
@@ -50,14 +51,7 @@ function SearchContent() {
   const page = parseInt(searchParams.get('page') || '1', 10);
 
   useEffect(() => {
-    const supabase = createClient();
-    if (!supabase) return;
-
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        setClientUser({ id: data.user.id });
-      }
-    });
+    setClientUser(getClientUser());
   }, []);
 
   useEffect(() => {

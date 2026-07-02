@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { createClient } from '@/src/lib/supabase/client';
+import { getClientUser } from '@/src/lib/auth-client';
 
 type Review = {
   id: string;
@@ -44,7 +44,7 @@ export default function ReviewsSection({ gameId, robloxUrl }: { gameId: string; 
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [userReview, setUserReview] = useState<Review | null>(null);
-  const [currentUser, setCurrentUser] = useState<{ id: string; user_metadata?: { roblox_username?: string } } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ id: string; name?: string | null } | null>(null);
   const [sort, setSort] = useState('recent');
   const [page, setPage] = useState(1);
   const [hasPlayedGame, setHasPlayedGame] = useState(false);
@@ -61,23 +61,13 @@ export default function ReviewsSection({ gameId, robloxUrl }: { gameId: string; 
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    const supabase = createClient();
-    if (!supabase) return;
-
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        setCurrentUser({ 
-          id: data.user.id,
-          user_metadata: data.user.user_metadata as any
-        });
-      }
-    });
+    setCurrentUser(getClientUser());
   }, []);
 
   // Check if user has played the game
   useEffect(() => {
     const checkPlayStatus = async () => {
-      if (!currentUser?.user_metadata?.roblox_username) {
+      if (!currentUser?.name) {
         setCheckingPlayStatus(false);
         return;
       }
@@ -92,7 +82,7 @@ export default function ReviewsSection({ gameId, robloxUrl }: { gameId: string; 
         }
 
         const robloxGameId = gameIdMatch[1];
-        const username = currentUser.user_metadata.roblox_username;
+        const username = currentUser.name;
 
         // Call our API endpoint to check if user has played the game
         const response = await fetch('/api/roblox/player-games', {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@/src/lib/supabase/client';
+import { getClientUser } from '@/src/lib/auth-client';
 
 export default function FollowGameButton({ gameId }: { gameId: string }) {
   const [isFollowing, setIsFollowing] = useState(false);
@@ -10,15 +10,7 @@ export default function FollowGameButton({ gameId }: { gameId: string }) {
   const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
 
   useEffect(() => {
-    const checkUser = async () => {
-      const supabase = createClient();
-      if (!supabase) return;
-
-      const { data: { user } } = await supabase.auth.getUser();
-      setCurrentUser(user ? { id: user.id } : null);
-    };
-
-    checkUser();
+    setCurrentUser(getClientUser());
   }, []);
 
   useEffect(() => {

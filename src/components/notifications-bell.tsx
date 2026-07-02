@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { createClient } from '@/src/lib/supabase/client';
+import { getClientUser } from '@/src/lib/auth-client';
 
 type Notification = {
   id: string;
@@ -26,10 +26,7 @@ export default function NotificationsBell() {
   // Check user and load notifications
   useEffect(() => {
     const checkUserAndLoad = async () => {
-      const supabase = createClient();
-      if (!supabase) return;
-
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = getClientUser();
       if (user) {
         setCurrentUser({ id: user.id });
         // Load user's notification preference
@@ -51,8 +48,7 @@ export default function NotificationsBell() {
   // Load notifications
   useEffect(() => {
     const loadNotifications = async () => {
-      const supabase = createClient();
-      if (!supabase || !currentUser) return;
+      if (!currentUser) return;
 
       setLoading(true);
       try {

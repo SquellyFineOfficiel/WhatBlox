@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@/src/lib/supabase/client';
+import { getClientUser } from '@/src/lib/auth-client';
 
 type Wishlist = {
   id: string;
@@ -24,14 +24,7 @@ export default function AddToWishlistButton({ gameId }: { gameId: string }) {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    const supabase = createClient();
-    if (!supabase) return;
-
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        setCurrentUser({ id: data.user.id });
-      }
-    });
+    setCurrentUser(getClientUser());
   }, []);
 
   useEffect(() => {

@@ -6,8 +6,20 @@ import ReviewsSection from '@/src/components/reviews-section';
 import CommentsSection from '@/src/components/comments-section';
 import AddToWishlistButton from '@/src/components/add-to-wishlist-button';
 import FollowGameButton from '@/src/components/follow-game-button';
+import ExpandableDescription from '@/src/components/expandable-description';
+import TrackRecentlyViewed from '@/src/components/track-recently-viewed';
 
 const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
+
+// Fisher-Yates shuffle — unbiased, unlike `.sort(() => 0.5 - Math.random())`.
+function shuffle<T>(items: T[]): T[] {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
 
 export default async function GamePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -32,26 +44,40 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
 
   if (!game) notFound();
 
-  const [metadata, allGamesRes, relatedRes] = await Promise.all([
+  const [metadata, newerRes, olderRes, relatedRes] = await Promise.all([
     getRobloxGameMetadata(game.roblox_url),
-    supabase.from('games').select('id').eq('status', 'approved').order('created_at', { ascending: false }),
-    supabase.from('games').select('id,title,description').eq('status', 'approved').neq('id', id).limit(20),
+    supabase
+      .from('games')
+      .select('id')
+      .eq('status', 'approved')
+      .gt('created_at', game.created_at)
+      .order('created_at', { ascending: true })
+      .limit(1),
+    supabase
+      .from('games')
+      .select('id')
+      .eq('status', 'approved')
+      .lt('created_at', game.created_at)
+      .order('created_at', { ascending: false })
+      .limit(1),
+    supabase.from('games').select('id,title,description,roblox_url').eq('status', 'approved').neq('id', id).limit(20),
   ]);
 
-  const ids = ((allGamesRes.data ?? []) as { id: string }[]).map(g => g.id);
-  const idx = ids.indexOf(id);
-  const prevId = idx > 0 ? ids[idx - 1] : null;
-  const nextId = idx < ids.length - 1 ? ids[idx + 1] : null;
+  const prevId = (newerRes.data ?? [])[0]?.id ?? null;
+  const nextId = (olderRes.data ?? [])[0]?.id ?? null;
 
-  const related = ((relatedRes.data ?? []) as { id: string; title: string; description: string }[])
-    .sort(() => 0.5 - Math.random())
-    .slice(0, 4);
+  const relatedCandidates = (relatedRes.data ?? []) as { id: string; title: string; description: string; roblox_url: string }[];
+  const related = shuffle(relatedCandidates).slice(0, 4);
+  const relatedMetadata = Object.fromEntries(
+    await Promise.all(related.map(async g => [g.id, await getRobloxGameMetadata(g.roblox_url)] as const))
+  );
 
   const title = metadata?.title || game.title;
   const description = metadata?.description || game.description;
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+      <TrackRecentlyViewed gameId={id} title={title} thumbnailUrl={metadata?.thumbnail_url} />
       {/* Navigation row */}
       <div className="mb-6 flex items-center justify-between gap-4">
         <Link
@@ -107,7 +133,7 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
           <div className="order-2 flex flex-col justify-between p-7 lg:order-1">
             <div>
               <h1 className="text-3xl font-black tracking-tight text-white leading-tight lg:text-4xl">{title}</h1>
-              <p className="mt-3 text-sm text-rbx-muted leading-relaxed line-clamp-4">{description}</p>
+              <ExpandableDescription description={description} />
             </div>
             <div className="mt-6 grid grid-cols-3 gap-2">
               <div className="rounded-xl border border-rbx-border bg-rbx-surface-2 p-3">
@@ -153,16 +179,38 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
             <Link href="/discovery" className="text-sm text-rbx-muted transition hover:text-white">See all</Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {related.map(g => (
-              <Link
-                key={g.id}
-                href={`/game/${g.id}`}
-                className="rounded-2xl border border-rbx-border bg-rbx-surface p-4 transition hover:border-white/20 hover:-translate-y-px"
-              >
-                <p className="line-clamp-1 text-sm font-bold text-white">{g.title}</p>
-                <p className="mt-1.5 line-clamp-2 text-xs text-rbx-muted">{g.description}</p>
-              </Link>
-            ))}
+            {related.map(g => {
+              const relMeta = relatedMetadata[g.id];
+              const relTitle = relMeta?.title || g.title;
+              return (
+                <Link
+                  key={g.id}
+                  href={`/game/${g.id}`}
+                  className="group overflow-hidden rounded-2xl border border-rbx-border bg-rbx-surface transition hover:border-white/20 hover:-translate-y-px"
+                >
+                  <div className="aspect-video overflow-hidden bg-rbx-surface-3">
+                    {relMeta?.thumbnail_url ? (
+                      <img
+                        src={relMeta.thumbnail_url}
+                        alt={relTitle}
+                        width={640}
+                        height={360}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-rbx-surface-2 to-rbx-surface-3 text-lg font-black text-rbx-muted">
+                        {relTitle.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <p className="line-clamp-1 text-sm font-bold text-white">{relTitle}</p>
+                    <p className="mt-1.5 line-clamp-2 text-xs text-rbx-muted">{relMeta?.description || g.description}</p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}
