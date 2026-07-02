@@ -45,11 +45,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* End Google tag (gtag.js) */}
 
         {/* Google AdSense */}
-        <Script
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2761470674512958"
           crossOrigin="anonymous"
-          strategy="beforeInteractive"
         />
         {/* End Google AdSense */}
       </head>
