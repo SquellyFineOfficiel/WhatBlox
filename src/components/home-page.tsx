@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { createClient } from '@/src/lib/supabase/client';
 import { calculateTrendingScore } from '@/src/lib/game-ranking';
 import { formatStat, getRobloxGameMetadata, type RobloxMetadata } from '@/src/lib/roblox';
+import AdBanner from '@/src/components/ad-banner';
 
 type Game = {
   id: string;
@@ -442,6 +443,13 @@ export default function HomePage({ user, isConfigured }: HomePageProps) {
               })}
             </div>
           </section>
+
+          {/* Ad — between Trending and Newest */}
+          <AdBanner
+            slot="7452109863"
+            format="horizontal"
+            className="rounded-2xl border border-rbx-border/50 bg-rbx-surface/40 p-2"
+          />
 
           {/* ── Newest ── */}
           <section className="animate-fade-up-slow">

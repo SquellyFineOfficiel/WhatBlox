@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/src/lib/supabase/client';
 import { formatStat, getRobloxGameMetadata, type RobloxMetadata } from '@/src/lib/roblox';
+import AdBanner from '@/src/components/ad-banner';
 
 const isValidRobloxUrl = (v: string) => /^https?:\/\/([a-z0-9-]+\.)?roblox\.com\//i.test(v);
 
@@ -314,6 +315,13 @@ export default function SubmitPage() {
           )}
         </aside>
       </div>
+
+      {/* Ad — below submit form */}
+      <AdBanner
+        slot="3987621540"
+        format="horizontal"
+        className="mt-10 rounded-2xl border border-rbx-border/50 bg-rbx-surface/40 p-2"
+      />
     </main>
   );
 }

@@ -43,6 +43,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           `}
         </Script>
         {/* End Google tag (gtag.js) */}
+
+        {/* Google AdSense */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2761470674512958"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+        {/* End Google AdSense */}
       </head>
       <body>
         {/* Google Tag Manager (noscript) */}
