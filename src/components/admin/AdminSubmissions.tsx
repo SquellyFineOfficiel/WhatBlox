@@ -1,13 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useToast } from '@/hooks/useToast';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader2, CheckCircle2, XCircle, ExternalLink, User, Clock } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface Submission {
   id: string;

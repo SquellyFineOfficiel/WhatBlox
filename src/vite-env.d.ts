@@ -70,4 +70,11 @@ declare module 'lucide-react' {
   export const TrendingDown: LucideIcon;
   export const RefreshCw: LucideIcon;
   export const CheckCircle2: LucideIcon;
+  export const Inbox: LucideIcon;
+  export const XCircle: LucideIcon;
+  export const ExternalLink: LucideIcon;
+  export const Send: LucideIcon;
+  export const History: LucideIcon;
+  export const User: LucideIcon;
+  export const Clock: LucideIcon;
 }

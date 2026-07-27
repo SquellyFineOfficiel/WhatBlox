@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -11,10 +11,9 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/lib/supabase';
-import { getIcon, getGradient } from '@/lib/icons';
+import { getIcon } from '@/lib/icons';
 import { useToast } from '@/hooks/useToast';
-import { Loader2, Globe, ExternalLink, User, Send, History } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Loader2, Globe, ExternalLink, Send, History } from 'lucide-react';
 
 const SUBMISSION_IDS_KEY = 'whatblox_my_submissions';
 
@@ -48,13 +47,15 @@ export function SubmitGameDialog({
   const [showTrack, setShowTrack] = useState(false);
 
   // Track-my-submissions state
-  const mySubmissionIds = useRef<string[]>(() => {
-    try {
-      return JSON.parse(localStorage.getItem(SUBMISSION_IDS_KEY) || '[]');
-    } catch {
-      return [];
-    }
-  });
+  const mySubmissionIds = useRef<string[]>(
+    (() => {
+      try {
+        return JSON.parse(localStorage.getItem(SUBMISSION_IDS_KEY) || '[]');
+      } catch {
+        return [];
+      }
+    })()
+  );
   const [mySubmissions, setMySubmissions] = useState<Array<{ id: string; title: string | null; status: string; created_at: string }>>([]);
   const [fetchingTracked, setFetchingTracked] = useState(false);
 
