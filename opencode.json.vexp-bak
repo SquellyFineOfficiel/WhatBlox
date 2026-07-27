@@ -1,0 +1,16 @@
+{
+  "mcp": {
+    "vexp": {
+      "type": "local",
+      "command": [
+        "node",
+        "c:\\Users\\erwan\\.vscode\\extensions\\vexp.vexp-vscode-2.2.3-win32-x64\\dist\\mcp-server.cjs"
+      ],
+      "env": {
+        "VEXP_WORKSPACE": "d:\\Documents\\WhatBlox"
+      },
+      "enabled": true
+    }
+  },
+  "$schema": "https://opencode.ai/config.json"
+}

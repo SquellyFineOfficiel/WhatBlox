@@ -1,0 +1,42 @@
+node_modules
+dist
+dist-ssr
+*.local
+.env
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Opencode config & skills
+.opencode/
+
+# Vite
+.vite/
+
+# Test coverage
+coverage/
+
+# TurboRepo
+.turbo/
+
+# Vercel / Netlify
+.vercel
+.netlify
+
+# ESLint cache
+.eslintcache
