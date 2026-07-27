@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { Search, X, RotateCcw, Eye, Upload, Badge, Boxes, ArrowUp, ArrowDown, Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Search, X, RefreshCw, Eye, Upload, Loader2, Tag, Package, ChevronLeft, ChevronRight, TrendingUp, TrendingDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -219,12 +219,6 @@ export function RolimonsBrowser() {
     }
   };
 
-  const getTrendIcon = (trend: number) => {
-    if (trend > 0) return <ArrowUp className="w-4 h-4 text-green-400" />;
-    if (trend < 0) return <ArrowDown className="w-4 h-4 text-red-400" />;
-    return <span className="w-4 h-4 text-slate-500">-</span>;
-  };
-
   return (
     <div className="space-y-6">
       {/* Filters Panel */}
@@ -234,7 +228,7 @@ export function RolimonsBrowser() {
             <CardTitle className="text-lg">Rolimons Item Browser</CardTitle>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={() => fetchItems()} disabled={isLoading}>
-                <RotateCcw className={cn('mr-2 h-4 w-4', isLoading && 'animate-spin')} />
+                <RefreshCw className={cn('mr-2 h-4 w-4', isLoading && 'animate-spin')} />
                 Refresh
               </Button>
             </div>

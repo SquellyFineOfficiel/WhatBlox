@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LayoutDashboard, Settings, LogOut, Menu, X, Boxes } from 'lucide-react';
+import { LayoutDashboard, Settings, LogOut, Menu, X, Package } from 'lucide-react';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { AdminLogin } from './AdminLogin';
 import { AdminDashboard } from './AdminDashboard';

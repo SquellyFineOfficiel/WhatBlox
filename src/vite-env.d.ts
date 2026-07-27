@@ -62,5 +62,11 @@ declare module 'lucide-react' {
   export const Globe: LucideIcon;
   export const Sparkle: LucideIcon;
   export const ChevronRight: LucideIcon;
+  export const ChevronLeft: LucideIcon;
   export const Mail: LucideIcon;
+  export const Package: LucideIcon;
+  export const Tag: LucideIcon;
+  export const TrendingUp: LucideIcon;
+  export const TrendingDown: LucideIcon;
+  export const RefreshCw: LucideIcon;
 }

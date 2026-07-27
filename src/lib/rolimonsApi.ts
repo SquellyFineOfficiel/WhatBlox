@@ -178,8 +178,8 @@ export function filterItems(
 
     if (typeof aVal === 'string') {
       return sortOrder === 'asc' 
-        ? aVal.localeCompare(bVal) 
-        : bVal.localeCompare(aVal);
+        ? aVal.localeCompare(bVal as string) 
+        : (bVal as string).localeCompare(aVal);
     }
     
     return sortOrder === 'asc' 
