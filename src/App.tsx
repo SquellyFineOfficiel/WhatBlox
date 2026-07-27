@@ -14,6 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { AdminPage } from '@/components/admin/AdminPage';
 import { SkeletonPage } from '@/components/ui/skeleton';
 import { MaintenancePage } from '@/components/landing/MaintenancePage';
+import { SubmitGameDialog } from '@/components/submit/SubmitGameDialog';
 import { useMaintenance } from '@/hooks/useMaintenance';
 
 function shuffleArray<T>(arr: T[]): T[] {
@@ -75,6 +76,7 @@ function HomePage() {
   const [particles, setParticles] = useState<Particle[]>([]);
   const [burstId, setBurstId] = useState(0);
   const [showIntro, setShowIntro] = useState(true);
+  const [submitOpen, setSubmitOpen] = useState(false);
 
   useEffect(() => {
     const t = window.setTimeout(() => setShowIntro(false), 340);
@@ -185,7 +187,7 @@ function HomePage() {
               For developers
             </Button>
           </div>
-          <Button variant="white" className="wb-pill wb-pill--solid" type="button">
+          <Button variant="white" className="wb-pill wb-pill--solid" type="button" onClick={() => setSubmitOpen(true)}>
             Submit a game
           </Button>
         </nav>
@@ -969,6 +971,11 @@ function HomePage() {
           display: none;
         }
       `}</style>
+
+      <SubmitGameDialog
+        open={submitOpen}
+        onOpenChange={setSubmitOpen}
+      />
     </div>
   );
 }

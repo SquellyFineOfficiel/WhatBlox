@@ -1,16 +1,16 @@
 import { useState } from 'react';
-import { LayoutDashboard, Settings, LogOut, Menu, X, Package } from 'lucide-react';
+import { LayoutDashboard, Settings, LogOut, Menu, X, Inbox } from 'lucide-react';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { AdminLogin } from './AdminLogin';
 import { AdminDashboard } from './AdminDashboard';
-import { RolimonsBrowser } from './RolimonsBrowser';
+import { AdminSubmissions } from './AdminSubmissions';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
 export function AdminPage() {
   const { isAuthenticated, isLoading, logout } = useAdminAuth();
-  const [activeTool, setActiveTool] = useState<'scraper' | 'rolimons' | 'settings'>('scraper');
+  const [activeTool, setActiveTool] = useState<'scraper' | 'submissions' | 'settings'>('scraper');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (isLoading) {
@@ -31,7 +31,7 @@ export function AdminPage() {
 
   const tools = [
     { id: 'scraper', label: 'Game Scraper', icon: LayoutDashboard },
-    { id: 'rolimons', label: 'Rolimons Items', icon: Package },
+    { id: 'submissions', label: 'Submissions', icon: Inbox },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
@@ -75,7 +75,7 @@ export function AdminPage() {
                 <button
                   key={tool.id}
                   onClick={() => {
-                    setActiveTool(tool.id as 'scraper' | 'settings');
+                    setActiveTool(tool.id as 'scraper' | 'submissions' | 'settings');
                     setSidebarOpen(false);
                   }}
                   className={cn(
@@ -127,7 +127,7 @@ export function AdminPage() {
           <ScrollArea className="h-[calc(100vh-4rem)] lg:h-[calc(100vh)]">
             <div className="p-4 lg:p-6 space-y-6">
               {activeTool === 'scraper' && <AdminDashboard />}
-              {activeTool === 'rolimons' && <RolimonsBrowser />}
+              {activeTool === 'submissions' && <AdminSubmissions />}
               {activeTool === 'settings' && <AdminSettings />}
             </div>
           </ScrollArea>

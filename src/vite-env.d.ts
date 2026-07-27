@@ -69,4 +69,5 @@ declare module 'lucide-react' {
   export const TrendingUp: LucideIcon;
   export const TrendingDown: LucideIcon;
   export const RefreshCw: LucideIcon;
+  export const CheckCircle2: LucideIcon;
 }
